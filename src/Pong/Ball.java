@@ -5,5 +5,12 @@ package Pong;
  *
  */
 public class Ball {
-
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getXPos(){
+		return 0;
+	}
 }
