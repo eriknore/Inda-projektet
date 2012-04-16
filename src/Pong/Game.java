@@ -4,6 +4,7 @@ import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.AppGameContainer;
 
@@ -14,11 +15,16 @@ import org.newdawn.slick.AppGameContainer;
  */
 public class Game extends BasicGame {
 
-	private Image testBackground;
-	private Image paddleImage;
-	private Image ballImage;
-	private static int width = 800;
-	private static int height = 600;
+	private Image background, ballImage;
+	private static int width = 800, height = 600; // resolution
+	// start-position, width between paddle and frame
+	private final int paddle1XPosition = 20, speedFactor = 3;
+	private int paddle2XPosition;
+	private Paddle paddle1, paddle2;
+	private Ball ball;
+	
+	// förslag: sätta dessa fyra i if-satser i update-metoden (update-klass?) för att göra olika saker i render
+	private boolean inPlayMode = false, menuMode = false, servingMode = false, twoPlayer = false;
 	
     public Game() {
         super("Pong");
@@ -29,9 +35,16 @@ public class Game extends BasicGame {
      */
     @Override
     public void init(GameContainer container) throws SlickException {
-    	testBackground = new Image("data/backgrounds/default.png");
-    	paddleImage = new Image("data/paddles/paddle.png");
+    	background = new Image("data/backgrounds/default.png");
+    	Image paddleImage = new Image("data/paddles/paddle.png"); // bör sättas i paddle, men senare med meny?
     	ballImage = new Image("data/ball/default.png");
+    	int yStart = (height-paddleImage.getHeight())/2;
+    	paddle1 = new Paddle(yStart, height, paddleImage); // both paddles start at same y-position
+    	paddle2 = new Paddle(yStart, height, paddleImage);
+    	// mirror the startposition of paddle1
+    	paddle2XPosition = width-paddle1XPosition-paddleImage.getWidth();
+       	// Nedan är start-koordinater för en boll, dock skulle vi ju serva bollen så måste ändras till att följa paddlarna
+    	ball = new Ball((width-ballImage.getWidth())/2, (height-ballImage.getHeight())/2, ballImage);
     }
 
     /**
@@ -40,7 +53,23 @@ public class Game extends BasicGame {
      */
     @Override
     public void update(GameContainer container, int delta)
-            throws SlickException {}
+            throws SlickException {
+    	Input input = container.getInput();
+    	
+    	int speed = delta/speedFactor;
+   	 
+        if(input.isKeyDown(Input.KEY_W))
+        	paddle1.paddleUp(speed);
+ 
+        if(input.isKeyDown(Input.KEY_S))
+        	paddle1.paddleDown(speed);
+        
+        if(input.isKeyDown(Input.KEY_UP))
+            paddle2.paddleUp(speed);
+ 
+        if(input.isKeyDown(Input.KEY_DOWN))
+        	paddle2.paddleDown(speed);
+    }
     
     /**
      * Renders the prepared output to visual output.
@@ -48,14 +77,10 @@ public class Game extends BasicGame {
     @Override
     public void render(GameContainer container, Graphics g)
             throws SlickException {
-    	testBackground.draw(0, 0);
-    	int paddle1X = 20;
-    	int paddle1Y = (height-paddleImage.getHeight())/2;
-    	int paddle2X = width-20-paddleImage.getWidth();
-    	int paddle2Y = (height-paddleImage.getHeight())/2;
-    	paddleImage.draw(paddle1X, paddle1Y);
-    	paddleImage.draw(paddle2X, paddle2Y);
-    	ballImage.draw((width-ballImage.getWidth())/2, (height-ballImage.getHeight())/2);
+    	background.draw(0, 0);
+    	paddle1.getImage().draw(paddle1XPosition, paddle1.getY());
+    	paddle2.getImage().draw(paddle2XPosition, paddle2.getY());
+    	ball.getImage().draw(ball.getNewXPosition(), ball.getNewYPosition());
     }
 
     public static void main(String[] args) {
@@ -66,5 +91,9 @@ public class Game extends BasicGame {
         } catch (SlickException e) {
             e.printStackTrace();
         }
+    }
+    
+    public Image getBackground() {
+    	return background;
     }
 }
