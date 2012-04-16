@@ -16,6 +16,9 @@ public class Game extends BasicGame {
 
 	private Image testBackground;
 	private Image paddleImage;
+	private Image ballImage;
+	private static int width = 800;
+	private static int height = 600;
 	
     public Game() {
         super("Pong");
@@ -26,8 +29,9 @@ public class Game extends BasicGame {
      */
     @Override
     public void init(GameContainer container) throws SlickException {
-    	testBackground = new Image("data/backgrounds/woodenbackground.png");
-    	paddleImage = new Image("data/paddles/paddle1.gif");
+    	testBackground = new Image("data/backgrounds/default.png");
+    	paddleImage = new Image("data/paddles/paddle.png");
+    	ballImage = new Image("data/ball/default.png");
     }
 
     /**
@@ -45,13 +49,19 @@ public class Game extends BasicGame {
     public void render(GameContainer container, Graphics g)
             throws SlickException {
     	testBackground.draw(0, 0);
-    	paddleImage.draw(20, 20);
+    	int paddle1X = 20;
+    	int paddle1Y = (height-paddleImage.getHeight())/2;
+    	int paddle2X = width-20-paddleImage.getWidth();
+    	int paddle2Y = (height-paddleImage.getHeight())/2;
+    	paddleImage.draw(paddle1X, paddle1Y);
+    	paddleImage.draw(paddle2X, paddle2Y);
+    	ballImage.draw((width-ballImage.getWidth())/2, (height-ballImage.getHeight())/2);
     }
 
     public static void main(String[] args) {
         try {
             AppGameContainer app = new AppGameContainer(new Game());
-            app.setDisplayMode(800, 600, false);
+            app.setDisplayMode(width, height, false);
             app.start();
         } catch (SlickException e) {
             e.printStackTrace();
