@@ -6,27 +6,23 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.AppGameContainer;
 
 /**
  * 
  * @author Erik Norell & Daniel Aceituno
  * @version 2012-04-16
  */
-public class Game extends BasicGame {
+public class GamePlayState extends BasicGame {
 
 	private Image background, ballImage;
-	private static int width = 800, height = 600; // resolution
+	private static int width = 800, height = 600; // ska inte vara i den här klassen
 	// start-position, width between paddle and frame
 	private final int paddle1XPosition = 20, speedFactor = 3;
 	private int paddle2XPosition;
 	private Paddle paddle1, paddle2;
 	private Ball ball;
-	
-	// förslag: sätta dessa fyra i if-satser i update-metoden (update-klass?) för att göra olika saker i render
-	private boolean inPlayMode = false, menuMode = false, servingMode = false, twoPlayer = false;
-	
-    public Game() {
+		
+    public GamePlayState() {
         super("Pong");
     }
     
@@ -80,17 +76,7 @@ public class Game extends BasicGame {
     	background.draw(0, 0);
     	paddle1.getImage().draw(paddle1XPosition, paddle1.getY());
     	paddle2.getImage().draw(paddle2XPosition, paddle2.getY());
-    	ball.getImage().draw(ball.getNewXPosition(), ball.getNewYPosition());
-    }
-
-    public static void main(String[] args) {
-        try {
-            AppGameContainer app = new AppGameContainer(new Game());
-            app.setDisplayMode(width, height, false);
-            app.start();
-        } catch (SlickException e) {
-            e.printStackTrace();
-        }
+    	ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
     }
     
     public Image getBackground() {

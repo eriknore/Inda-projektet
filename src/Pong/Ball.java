@@ -8,7 +8,7 @@ import org.newdawn.slick.Image;
  */
 public class Ball {
 	
-	private int xPosition, yPosition;
+	private int xPosition, yPosition, speedX, speedY;
 	private Image ballImage;
 	
 	public Ball(int xCoordinate, int yCoordinate, Image imageOfBall) {
@@ -21,30 +21,30 @@ public class Ball {
 	 * 
 	 * @return The ball's position on the x-axis
 	 */
-	public int getNewXPosition(){
+	public int getXPosition(){
 		return xPosition;
 	}
 	
 	/**
 	 * Sets a new position to the ball on the x-axis
 	 */
-	public void setNewXposition(int xCoordinate){
-		xPosition = xCoordinate;
+	public void moveX(int deltaX){
+		xPosition += deltaX;
 	}
 	
 	/**
 	 * 
 	 * @return The ball's position on the y-axis
 	 */
-	public int getNewYPosition(){
+	public int getYPosition(){
 		return yPosition;
 	}
 	
 	/**
 	 * Sets a new position to the ball on the y-axis
 	 */
-	public void setNewYposition(int yCoordinate){
-		yPosition = yCoordinate;
+	public void moveY(int deltaY){
+		yPosition += deltaY;
 		
 	}
 	
