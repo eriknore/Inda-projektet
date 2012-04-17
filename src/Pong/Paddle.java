@@ -38,7 +38,7 @@ public class Paddle {
 	/**
 	 *  Moves the paddle up
 	 */
-	public void paddleUp(int delta) {
+	public void paddleUp(float delta) {
 		if(yPosition <= 0)
 			yPosition += delta; // stops paddle from exiting screen
 		yPosition -= delta;
@@ -47,7 +47,7 @@ public class Paddle {
 	/**
 	 *  Moves the paddle down
 	 */
-	public void paddleDown(int delta) {
+	public void paddleDown(float delta) {
 		if(yPosition >= frameHeight-paddleImage.getHeight())
 			yPosition -= delta; // stops paddle from exiting screen
 		yPosition += delta;

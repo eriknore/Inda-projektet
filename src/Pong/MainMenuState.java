@@ -35,7 +35,7 @@ public class MainMenuState extends BasicGameState {
 
 
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		//bättre sätt?, Imagearray??
+		//bättre sätt?, Imagearray?? - troligtvis, men vet inte riktigt hur :)
 		menuBackground = new Image("data/backgrounds/menu.png");
 		pvpButton = new Image("data/menu/playervsplayer.png");
 		pvaiButton = new Image("data/menu/playervsai.png");
@@ -61,6 +61,11 @@ public class MainMenuState extends BasicGameState {
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
 		Input input = gc.getInput();
+		
+		if(input.isKeyDown(Input.KEY_ESCAPE)) {
+			Transition t = new FadeOutTransition();
+			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+		}
 
 		if(pvpButtonArea.isMouseOver()){
 			//TODO effect, visuell mouseover
