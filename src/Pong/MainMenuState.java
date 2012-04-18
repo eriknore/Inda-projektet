@@ -13,8 +13,8 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.Transition;
 /**
- * pvp = player vs player, refactor?
- * @author dace
+ * A stateclass representing the main menu.
+ * @author Erik Norell & Daniel Aceituno
  * @version 2012-04-17
  */
 public class MainMenuState extends BasicGameState {
@@ -23,8 +23,7 @@ public class MainMenuState extends BasicGameState {
 
 	private Image menuBackground, pvpButton, pvaiButton, scoreButton, optionsButton, quitButton;
 
-
-	private int firstMenuButtonX = 80; //pvpButton
+	private int firstMenuButtonX = 80; 
 	private int firstMenuButtonY = 50;
 
 	private MouseOverArea pvpButtonArea, pvaiButtonArea, scoreButtonArea, optionsButtonArea, quitButtonArea; 
@@ -35,7 +34,6 @@ public class MainMenuState extends BasicGameState {
 
 
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
-		//bättre sätt?, Imagearray?? - troligtvis, men vet inte riktigt hur :)
 		menuBackground = new Image("data/backgrounds/menu.png");
 		pvpButton = new Image("data/menu/playervsplayer.png");
 		pvaiButton = new Image("data/menu/playervsai.png");
@@ -57,30 +55,52 @@ public class MainMenuState extends BasicGameState {
 		scoreButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
 		optionsButton.draw(firstMenuButtonX, firstMenuButtonY + 240);
 		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 320);
+		buttonVisualEffect();
+	}
+
+	/**
+	 * Temporarly decreases the button's scale if
+	 * the mouse is on the button.
+	 */
+	private void buttonVisualEffect(){
+		MouseOverArea[] areas = {pvpButtonArea, pvaiButtonArea, scoreButtonArea, optionsButtonArea, quitButtonArea}; 
+		Image[] images = {pvpButton, pvaiButton, scoreButton, optionsButton, quitButton};
+		for(int i = 0 ; i < areas.length ; i++){
+			if(areas[i].isMouseOver()){
+				images[i].draw(firstMenuButtonX, firstMenuButtonY + (i*80), 0.99f);
+			}
+		}
 	}
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
 		Input input = gc.getInput();
-		
-		if(input.isKeyDown(Input.KEY_ESCAPE)) {
-			Transition t = new FadeOutTransition();
+		Transition t = new FadeOutTransition();
+
+		if(input.isKeyDown(Input.KEY_ESCAPE)) 
 			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
-		}
 
 		if(pvpButtonArea.isMouseOver()){
-			//TODO effect, visuell mouseover
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
+				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); 
+		}
+
+		if(pvaiButtonArea.isMouseOver()){ //Gå över till gameplaystate eller twoplayerstate?
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
-				Transition t = new FadeOutTransition(); 
-				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); //Stänger detta menuState?
+				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); 
 			}
 		}
+		
+		if(scoreButtonArea.isMouseOver()){
+			//highscoreState
+		}
+		if(optionsButtonArea.isMouseOver()){
+			//optionsState
+		}
+		
 		if(quitButtonArea.isMouseOver()){
-			//TODO effekt, visuell mouseover
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
 				gc.exit();
 		}
-
-		//TODO Alla andra areas	
 	}
 
 	/**

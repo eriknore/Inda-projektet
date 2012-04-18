@@ -23,8 +23,6 @@ public class PongGame extends StateBasedGame {
         this.enterState(MAINMENUSTATE);
 	}
 
-	
-
 	public static void main(String[] args) {
 		try {
 			AppGameContainer app = new AppGameContainer(new PongGame());

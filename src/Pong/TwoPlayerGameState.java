@@ -6,4 +6,9 @@ package Pong;
  */
 public class TwoPlayerGameState extends GamePlayState {
 
+	public TwoPlayerGameState(int stateID) {
+		super(stateID);
+		// TODO Auto-generated constructor stub
+	}
+
 }

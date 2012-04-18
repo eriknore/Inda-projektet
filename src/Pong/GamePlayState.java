@@ -29,6 +29,9 @@ public class GamePlayState extends BasicGameState {
 	private Paddle paddleLeft, paddleRight;
 	private Ball ball;
 
+	private int leftScore = 0;
+	private int rightScore = 0;
+
 
 	public GamePlayState(int stateID) {
 		this.stateID = stateID;
@@ -43,9 +46,7 @@ public class GamePlayState extends BasicGameState {
 		return stateID;
 	}
 
-	/**
-	 * Initializes data before starting the actual game loop.
-	 */
+
 	@Override
 	public void init(GameContainer container, StateBasedGame sbg) throws SlickException {
 		height = container.getHeight();
@@ -62,14 +63,10 @@ public class GamePlayState extends BasicGameState {
 		ball = new Ball((width-ballImage.getWidth())/2, (height-ballImage.getHeight())/2, ballImage);
 	}
 
-	/**
-	 * Updates game logic during the gameplay.
-	 * Receives user input and prepares an output.
-	 */
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
-		
+
 		// Necessary coordinates for collision-control of ball
 		HashMap<String, Integer> currentState = new HashMap<String, Integer>();
 		currentState.put("pLeftX", paddleLeftXPosition);
@@ -82,23 +79,23 @@ public class GamePlayState extends BasicGameState {
 		currentState.put("frameWidth", width);
 		currentState.put("angle", paddleLeft.getAngle());
 		float speed = delta/4;
-		
+
 		ball.moveBall(currentState, speed);
-		
-		
+
+
 		Input input = container.getInput();
-		
+
 		if(input.isKeyDown(Input.KEY_ESCAPE)) {
 			Transition t = new FadeOutTransition();
 			sbg.enterState(PongGame.MAINMENUSTATE, t, t);
 		}
-		
+
 		if(input.isKeyDown(Input.KEY_W))
 			paddleLeft.paddleUp(speed);
 
 		if(input.isKeyDown(Input.KEY_S))
 			paddleLeft.paddleDown(speed);
-		
+
 		if(input.isKeyDown(Input.KEY_D))
 			ball.servedLeft();
 
@@ -107,14 +104,14 @@ public class GamePlayState extends BasicGameState {
 
 		if(input.isKeyDown(Input.KEY_DOWN))
 			paddleRight.paddleDown(speed);
-		
+
 		if(input.isKeyDown(Input.KEY_LEFT))
 			ball.servedRight();
+		
+		if(ball.wasOutOfBounds())
+			playerScore();
 	}
 
-	/**
-	 * Renders the prepared output to visual output.
-	 */
 	@Override
 	public void render(GameContainer container, StateBasedGame sbg, Graphics g)
 			throws SlickException {
@@ -122,6 +119,25 @@ public class GamePlayState extends BasicGameState {
 		paddleLeft.getImage().draw(paddleLeftXPosition, paddleLeft.getY());
 		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
 		ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
+
+		g.drawString("" + rightScore, 500, 30);
+		g.drawString("" + leftScore, 40, 30);
+
+	}
+	
+	// lagt till denna metod nedan, två drawstrings ovan,, som vi kan byta plats/storlek på. 
+	//och sista ifsatsen i update()
+	//radera detta när du har läst :)
+	/**
+	 * 
+	 */
+	private void playerScore(){
+		if(ball.getIsServingRight()){
+			leftScore++;
+		}else{
+			rightScore++;
+		}
+
 	}
 
 	public Image getBackground() {
