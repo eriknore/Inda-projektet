@@ -139,20 +139,30 @@ public class Ball {
 		if(xPosition + speedX < rightBorder && xPosition + speedX > leftBorder) {
 			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
 				xPosition = rightBorder;
-				int ballValue = (yPosition-topBorder)-(diameter/2); // center of ball relative to paddle
-				double paddleValue; // will give each pixel of paddle an angle value
-				int paddleHeight = bottomBorder-topBorder;
-				if(yPosition < topBorder+(paddleHeight/2) && yPosition + diameter > topBorder) {
-					paddleValue = (90-angle)/(ballValue+diameter);
-					speedY = -Math.sin(Math.toRadians(paddleValue));
-				} else if(ballValue > (paddleHeight)/2) {
-					paddleValue = ((90-angle))/(-ballValue+paddleHeight);
-					speedY = Math.sin(Math.toRadians(paddleValue));
-				} else {
-					speedY = -speedY;
-					return;
+				
+				// ball relative to paddle, value is where on paddle the center of ball is
+				double ballValue = (yPosition-(topBorder-diameter)); 	
+				// the angle at which the ball is returned with y + angle (default angle is 30)
+				double returnAngle = (90-angle); // i.e. 60 degrees
+				// half the paddle-height including ball-radius at both ends of paddle
+				double halfPaddleHeight = (bottomBorder-topBorder+diameter)/2; // default: 120/2
+				// set a ratio between angle and paddle-size
+				double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
+				double newYSpeed;
+				if(yPosition+diameter < topBorder+halfPaddleHeight) { // above paddle-center
+					// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
+					// 1<= newYSpeed <= 60
+					newYSpeed = returnAngle-(ballValue*angleHeightRatio);
+					speedY = -Math.sin(Math.toRadians(newYSpeed)); // minus because up is -Y
+				} else if(yPosition > bottomBorder-halfPaddleHeight) { // below paddle-center
+					// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
+					// 1<= newYSpeed <= 60
+					newYSpeed = (-returnAngle)+(ballValue*angleHeightRatio);
+					speedY = Math.sin(Math.toRadians(newYSpeed)); // no minus because up is +Y
+				} else { // dead on center
+					speedY = -speedY; // straight back
 				}
-				speedX = -speedX;			
+				speedX = -speedX;
 			}
 		}
 	}
@@ -161,18 +171,28 @@ public class Ball {
 		if(xPosition + diameter + speedX > leftBorder && xPosition + diameter + speedX < rightBorder) {
 			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
 				xPosition = leftBorder - diameter;
-				int ballValue = (yPosition-topBorder+diameter)-(diameter/2); // center of ball relative to paddle
-				double paddleValue; // will give each pixel of paddle an angle value
-				int paddleHeight = bottomBorder-topBorder;
-				if(yPosition < topBorder+(paddleHeight/2) && yPosition + diameter > topBorder) {
-					paddleValue = (90-angle)/(ballValue);
-					speedY = -Math.sin(Math.toRadians(paddleValue));
-				} else if(yPosition < bottomBorder+(paddleHeight/2) && yPosition + diameter > bottomBorder) {
-					paddleValue = ((90-angle))/(-ballValue+paddleHeight);
-					speedY = Math.sin(Math.toRadians(paddleValue));
-				} else {
-					speedY = -speedY;
-					return;
+
+				// ball relative to paddle, value is where on paddle the center of ball is
+				double ballValue = (yPosition-(topBorder-diameter)); 	
+				// the angle at which the ball is returned with y + angle (default angle is 30)
+				double returnAngle = (90-angle); // i.e. 60 degrees
+				// half the paddle-height including ball-radius at both ends of paddle
+				double halfPaddleHeight = (bottomBorder-topBorder+diameter)/2; // default: 120/2
+				// set a ratio between angle and paddle-size
+				double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
+				double newYSpeed;
+				if(yPosition+diameter < topBorder+halfPaddleHeight) { // above paddle-center
+					// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
+					// 1<= newYSpeed <= 60
+					newYSpeed = returnAngle-(ballValue*angleHeightRatio);
+					speedY = -Math.sin(Math.toRadians(newYSpeed)); // minus because up is -Y
+				} else if(yPosition > bottomBorder-halfPaddleHeight) { // below paddle-center
+					// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
+					// 1<= newYSpeed <= 60
+					newYSpeed = (-returnAngle)+(ballValue*angleHeightRatio);
+					speedY = Math.sin(Math.toRadians(newYSpeed)); // no minus because up is +Y
+				} else { // dead on center
+					speedY = -speedY; // straight back
 				}
 				speedX = -speedX;
 			}
