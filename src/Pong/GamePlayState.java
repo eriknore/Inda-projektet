@@ -80,6 +80,7 @@ public class GamePlayState extends BasicGameState {
 		currentState.put("pHeight", paddleLeft.getImage().getHeight());
 		currentState.put("frameHeight", height);
 		currentState.put("frameWidth", width);
+		currentState.put("angle", paddleLeft.getAngle());
 		float speed = delta/4;
 		
 		ball.moveBall(currentState, speed);

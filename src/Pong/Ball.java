@@ -11,7 +11,8 @@ import org.newdawn.slick.Image;
  */
 public class Ball {
 	
-	private int xPosition, yPosition, speedX, speedY, diameter;
+	private int xPosition, yPosition, diameter;
+	private double speedX, speedY;
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
 	
@@ -82,49 +83,22 @@ public class Ball {
 	 */
 	public void moveBall(Map<String, Integer> state, float delta) {
 		if(isServingLeft) {
-			speedX = 1;
-			xPosition = state.get("pLeftX") + state.get("pWidth");
-			yPosition = state.get("pLeftY") + (state.get("pHeight")-diameter)/2;
+			// kolla serveLeft() för att förstå vad dessa värden innebär, ska refaktorisera
+			serveLeft(state.get("pLeftX") + state.get("pWidth"), state.get("pLeftY") + (state.get("pHeight")-diameter)/2);
 			return;
 		}
 		if(isServingRight) {
-			speedX = -1;
-			xPosition = state.get("pRightX") - ballImage.getWidth();
-			yPosition = state.get("pRightY") + (state.get("pHeight")-diameter)/2;
+			// kolla serveRight() för att förstå vad dessa värden innebär, ska refaktorisera
+			serveRight(state.get("pRightX") - ballImage.getWidth(), state.get("pRightY") + (state.get("pHeight")-diameter)/2);
 			return;
 		}
-		if(yPosition < 0) {
-			yPosition = 0;
-			speedY = -speedY;
-		}
-		if(yPosition + diameter > state.get("frameHeight")) {
-			yPosition = state.get("frameHeight") - diameter;
-			speedY = -speedY;
-		}
-		if(xPosition + diameter + speedX > state.get("pRightX") && xPosition + diameter + speedX < state.get("pRightX") + state.get("pWidth")) {
-			if(yPosition <= (state.get("pRightY") + state.get("pHeight")) && yPosition + diameter >= state.get("pRightY")) {
-				xPosition = state.get("pRightX") - diameter;
-				speedX = -speedX;	
-			}
-		}
-		if(xPosition + speedX < state.get("pLeftX") + state.get("pWidth") && xPosition + speedX > state.get("pLeftX")) {
-			if(yPosition <= (state.get("pLeftY") + state.get("pHeight")) && yPosition + diameter >= state.get("pLeftY")) {
-				xPosition = state.get("pLeftX") + state.get("pWidth");
-				speedX = -speedX;			
-			}
-		}
-		if(xPosition - 50 > state.get("frameWidth")) {
-			//TODO point for left player
-			isServingRight = true;
-			return;
-		}
-		if(xPosition + 50 < 0) {
-			//TODO point for right player
-			isServingLeft = true;
-			return;
-		}
-		yPosition += speedY*2*delta;
-		xPosition += speedX*2*delta;
+		checkWalls(state.get("frameHeight"));
+		// kolla CheckRight()/Left() för att förstå vad dessa värden innebär, ska refaktorisera
+		checkRight(state.get("pRightX") + state.get("pWidth"), state.get("pRightX"), state.get("pRightY") + state.get("pHeight"), state.get("pRightY"), state.get("angle"));
+		checkLeft(state.get("pLeftX") + state.get("pWidth"), state.get("pLeftX"), state.get("pLeftY") + state.get("pHeight"), state.get("pLeftY"), state.get("angle"));
+		checkOutOfBounds(state.get("frameWidth"));
+		yPosition += speedY*delta;
+		xPosition += speedX*delta;
 		return;
 	}
 	
@@ -134,5 +108,87 @@ public class Ball {
 	
 	public void servedRight() {
 		isServingRight = false;
+	}
+	
+	private void serveLeft(int boardX, int boardY) {
+		speedX = 2;
+		speedY = 0;
+		xPosition = boardX;
+		yPosition = boardY;
+	}
+	
+	private void serveRight(int boardX, int boardY) {
+		speedX = -2;
+		speedY = 0;
+		xPosition = boardX;
+		yPosition = boardY;
+	}
+	
+	private void checkWalls(int frameHeight) {
+		if(yPosition < 0) {
+			yPosition = 0 + 1;
+			speedY = -speedY;
+		}
+		if(yPosition + diameter > frameHeight) {
+			yPosition = frameHeight - diameter -1;
+			speedY = -speedY;
+		}
+	}
+	
+	private void checkLeft(int rightBorder, int leftBorder, int bottomBorder, int topBorder, int angle) {
+		if(xPosition + speedX < rightBorder && xPosition + speedX > leftBorder) {
+			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
+				xPosition = rightBorder;
+				int ballValue = (yPosition-topBorder)-(diameter/2); // center of ball relative to paddle
+				double paddleValue; // will give each pixel of paddle an angle value
+				int paddleHeight = bottomBorder-topBorder;
+				if(yPosition < topBorder+(paddleHeight/2) && yPosition + diameter > topBorder) {
+					paddleValue = (90-angle)/(ballValue+diameter);
+					speedY = -Math.sin(Math.toRadians(paddleValue));
+				} else if(ballValue > (paddleHeight)/2) {
+					paddleValue = ((90-angle))/(-ballValue+paddleHeight);
+					speedY = Math.sin(Math.toRadians(paddleValue));
+				} else {
+					speedY = -speedY;
+					return;
+				}
+				speedX = -speedX;			
+			}
+		}
+	}
+	
+	private void checkRight(int rightBorder, int leftBorder, int bottomBorder, int topBorder, int angle) {
+		if(xPosition + diameter + speedX > leftBorder && xPosition + diameter + speedX < rightBorder) {
+			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
+				xPosition = leftBorder - diameter;
+				int ballValue = (yPosition-topBorder+diameter)-(diameter/2); // center of ball relative to paddle
+				double paddleValue; // will give each pixel of paddle an angle value
+				int paddleHeight = bottomBorder-topBorder;
+				if(yPosition < topBorder+(paddleHeight/2) && yPosition + diameter > topBorder) {
+					paddleValue = (90-angle)/(ballValue);
+					speedY = -Math.sin(Math.toRadians(paddleValue));
+				} else if(yPosition < bottomBorder+(paddleHeight/2) && yPosition + diameter > bottomBorder) {
+					paddleValue = ((90-angle))/(-ballValue+paddleHeight);
+					speedY = Math.sin(Math.toRadians(paddleValue));
+				} else {
+					speedY = -speedY;
+					return;
+				}
+				speedX = -speedX;
+			}
+		}
+	}
+	
+	private void checkOutOfBounds(int frameWidth) {
+		if(xPosition - 50 > frameWidth) {
+			//TODO point for left player
+			isServingRight = true;
+			return;
+		}
+		if(xPosition + 50 < 0) {
+			//TODO point for right player
+			isServingLeft = true;
+			return;
+		}
 	}
 }

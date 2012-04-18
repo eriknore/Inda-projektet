@@ -11,6 +11,8 @@ public class Paddle {
 
 	private int yPosition, frameHeight;
 	private Image paddleImage;
+	// minimum output-angle from paddle in degrees (x and 180-x)
+	private final int angle = 30;
 
 	/**
 	 * Creates a paddle
@@ -60,5 +62,9 @@ public class Paddle {
 	 */
 	public Image getImage() {
 		return paddleImage;
+	}
+	
+	public int getAngle() {
+		return angle;
 	}
 }
