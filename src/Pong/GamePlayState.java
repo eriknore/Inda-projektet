@@ -121,7 +121,8 @@ public class GamePlayState extends BasicGameState {
 		ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
 
 		g.drawString("" + rightScore, 500, 30);
-		g.drawString("" + leftScore, 40, 30);
+		g.drawString("" + leftScore, 300, 30);
+		
 
 	}
 	
