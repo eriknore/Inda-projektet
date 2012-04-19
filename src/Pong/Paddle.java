@@ -1,6 +1,7 @@
 package Pong;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 /**
  * 
@@ -9,10 +10,11 @@ import org.newdawn.slick.Image;
  */
 public class Paddle {
 
-	private int yPosition, frameHeight;
+	private int yPosition, xPosition, frameHeight, AIdelay = 0;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
-	private final int angle = 30;
+	private final int angle = 30, paddleSpeed = 3;
+	private boolean isHuman;
 
 	/**
 	 * Creates a paddle
@@ -20,11 +22,14 @@ public class Paddle {
 	 * @param yCoordinate
 	 *            the Y-position of upper left corner at which the paddle is
 	 *            drawn
+	 * @throws SlickException 
 	 */
-	public Paddle(int yCoordinate, int frameHeight, Image imageOfPaddle) {
-		yPosition = yCoordinate;
+	public Paddle(int frameHeight, int xPosition, boolean humanPlayer) throws SlickException {
 		this.frameHeight = frameHeight;
-		paddleImage = imageOfPaddle;
+		paddleImage = new Image("data/paddles/paddle.png");
+		yPosition = (frameHeight-paddleImage.getHeight())/2;
+		this.xPosition = xPosition;
+		isHuman = humanPlayer;
 		
 	}
 
@@ -37,10 +42,15 @@ public class Paddle {
 		return yPosition;
 	}
 
+	public int getX() {
+		return xPosition;
+	}
+	
 	/**
 	 *  Moves the paddle up
 	 */
-	public void paddleUp(float delta) {
+	public void paddleUp(float timeDelta) {
+		float delta = timeDelta*paddleSpeed;
 		if(yPosition <= 0)
 			yPosition += delta; // stops paddle from exiting screen
 		yPosition -= delta;
@@ -49,7 +59,8 @@ public class Paddle {
 	/**
 	 *  Moves the paddle down
 	 */
-	public void paddleDown(float delta) {
+	public void paddleDown(float timeDelta) {
+		float delta = timeDelta*paddleSpeed;
 		if(yPosition >= frameHeight-paddleImage.getHeight())
 			yPosition -= delta; // stops paddle from exiting screen
 		yPosition += delta;
@@ -66,5 +77,27 @@ public class Paddle {
 	
 	public int getAngle() {
 		return angle;
+	}
+	
+	public void getAIMovement(Ball ball, float timeDelta) {
+		int ballPosition = ball.getYPosition();
+		int paddleCenter = yPosition + paddleImage.getHeight()/2;
+		if(ball.isServingLeft()) {
+			if(AIdelay > 40) {
+				ball.servedLeft();
+				AIdelay = 0;
+				return;
+			}
+			yPosition -= timeDelta*paddleSpeed;
+			AIdelay++;
+		} else if(ballPosition - 5 > paddleCenter) {
+			yPosition += timeDelta*paddleSpeed;
+		} else if(ballPosition + 5 < paddleCenter){
+			yPosition -= timeDelta*paddleSpeed;
+		}
+	}
+	
+	public boolean isHuman() {
+		return isHuman;
 	}
 }

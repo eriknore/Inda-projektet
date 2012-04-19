@@ -1,9 +1,9 @@
 package Pong;
 
-import java.util.Map;
 import java.util.Random;
 
 import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
 
 
 /**
@@ -13,17 +13,14 @@ import org.newdawn.slick.Image;
 public class Ball {
 
 	private int xPosition, yPosition, diameter;
-	private double speedX, speedY;
+	private double deltaX, deltaY, ballSpeed;
 	private Image ballImage;
-	private boolean isServingLeft = false, isServingRight = false, isOutOfBounds = false;
+	private boolean isServingLeft = false, isServingRight = false;
 
-	public Ball(int xCoordinate, int yCoordinate, Image imageOfBall) {
-		xPosition = xCoordinate;
-		yPosition = yCoordinate;
-		ballImage = imageOfBall;
+	public Ball() throws SlickException {
+		ballImage = new Image("data/ball/default.png");
 		diameter = ballImage.getWidth();
-		speedX = 0;
-		speedY = 0;
+		ballSpeed = 8;
 
 		// simulate a coinflip to decide which player to serve
 		Random rand = new Random();
@@ -45,27 +42,11 @@ public class Ball {
 	}
 
 	/**
-	 * Sets a new position to the ball on the x-axis
-	 */
-	public void moveX(int deltaX){
-		xPosition += deltaX;
-
-	}
-
-	/**
 	 * 
 	 * @return The ball's position on the y-axis
 	 */
 	public int getYPosition(){
 		return yPosition;
-	}
-
-	/**
-	 * Sets a new position to the ball on the y-axis
-	 */
-	public void moveY(int deltaY){
-		yPosition += deltaY;
-
 	}
 
 	/**
@@ -82,25 +63,13 @@ public class Ball {
 	 * @param bottomWall
 	 * @return
 	 */
-	public void moveBall(Map<String, Integer> state, float delta) {
-		isOutOfBounds = false;
-		if(isServingLeft) {
-			// kolla serveLeft() för att förstå vad dessa värden innebär, ska refaktorisera
-			serveLeft(state.get("pLeftX") + state.get("pWidth"), state.get("pLeftY") + (state.get("pHeight")-diameter)/2);
+	public void moveBall(Paddle left, Paddle right, int frameHeight, float deltaTime) {
+		if(serve(left, right))
 			return;
-		}
-		if(isServingRight) {
-			// kolla serveRight() för att förstå vad dessa värden innebär, ska refaktorisera
-			serveRight(state.get("pRightX") - ballImage.getWidth(), state.get("pRightY") + (state.get("pHeight")-diameter)/2);
-			return;
-		}
-		checkWalls(state.get("frameHeight"));
-		// kolla CheckRight()/Left() för att förstå vad dessa värden innebär, ska refaktorisera
-		checkRight(state.get("pRightX") + state.get("pWidth"), state.get("pRightX"), state.get("pRightY") + state.get("pHeight"), state.get("pRightY"), state.get("angle"));
-		checkLeft(state.get("pLeftX") + state.get("pWidth"), state.get("pLeftX"), state.get("pLeftY") + state.get("pHeight"), state.get("pLeftY"), state.get("angle"));
-		checkOutOfBounds(state.get("frameWidth"));
-		yPosition += speedY*delta;
-		xPosition += speedX*delta;
+		checkWalls(frameHeight);
+		checkPaddles(left, right);
+		yPosition += deltaY*deltaTime;
+		xPosition += deltaX*deltaTime;
 		return;
 	}
 
@@ -112,122 +81,107 @@ public class Ball {
 		isServingRight = false;
 	}
 
-	private void serveLeft(int boardX, int boardY) {
-		speedX = 2;
-		speedY = 0;
-		xPosition = boardX;
-		yPosition = boardY;
-	}
-
-	private void serveRight(int boardX, int boardY) {
-		speedX = -2;
-		speedY = 0;
-		xPosition = boardX;
-		yPosition = boardY;
+	private boolean serve(Paddle left, Paddle right) {
+		if(isServingLeft) { 
+			deltaX = ballSpeed;
+			deltaY = 0;
+			xPosition = left.getX() + left.getImage().getWidth();
+			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
+			return true;
+		} else if(isServingRight) {
+			deltaX = -ballSpeed;
+			deltaY = 0;
+			xPosition = right.getX() - diameter;
+			yPosition = right.getY() +(right.getImage().getHeight()-diameter)/2;
+			return true;
+		}
+		return false;
 	}
 
 	private void checkWalls(int frameHeight) {
-		if(yPosition < 0) {
-			yPosition = 0 + 1;
-			speedY = -speedY;
+		if(yPosition <= 0) {
+			yPosition = 1;
+			deltaY = -deltaY;
+			if(deltaY == 0)
+				deltaY = 1;
 		}
-		if(yPosition + diameter > frameHeight) {
+		if(yPosition + diameter >= frameHeight) {
 			yPosition = frameHeight - diameter -1;
-			speedY = -speedY;
+			deltaY = -deltaY;
+			if(deltaY == 0)
+				deltaY = -1;
 		}
 	}
 
-	private void checkLeft(int rightBorder, int leftBorder, int bottomBorder, int topBorder, int angle) {
-		if(xPosition + speedX < rightBorder && xPosition + speedX > leftBorder) {
-			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
-				xPosition = rightBorder;
-
-				// ball relative to paddle, value is where on paddle the center of ball is
-				double ballValue = (yPosition-(topBorder-diameter)); 	
-				// the angle at which the ball is returned with y + angle (default angle is 30)
-				double returnAngle = (90-angle); // i.e. 60 degrees
-				// half the paddle-height including ball-radius at both ends of paddle
-				double halfPaddleHeight = (bottomBorder-topBorder+diameter)/2; // default: 120/2
-				// set a ratio between angle and paddle-size
-				double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
-				double newYSpeed;
-				if(yPosition+diameter < topBorder+halfPaddleHeight) { // above paddle-center
-					// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
-					// 1<= newYSpeed <= 60
-					newYSpeed = returnAngle-(ballValue*angleHeightRatio);
-					speedY = -Math.sin(Math.toRadians(newYSpeed)); // minus because up is -Y
-				} else if(yPosition > bottomBorder-halfPaddleHeight) { // below paddle-center
-					// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
-					// 1<= newYSpeed <= 60
-					newYSpeed = (-returnAngle)+(ballValue*angleHeightRatio);
-					speedY = Math.sin(Math.toRadians(newYSpeed)); // no minus because up is +Y
-				} else { // dead on center
-					speedY = -speedY; // straight back
-				}
-				speedX = -speedX;
+	private void checkPaddles(Paddle left, Paddle right) {
+		int edgeOfPaddle = left.getX() + left.getImage().getWidth();
+		// if ball is to the left of left paddle in relation to X-position...
+		if(xPosition + deltaX <= edgeOfPaddle) {
+			int leftY = left.getY();
+			// ... then check if it is hitting the paddle or not
+			if(yPosition <= leftY + left.getImage().getHeight() && yPosition + diameter >= leftY) {
+				xPosition = edgeOfPaddle;
+				double angle = getAngleFromPaddle(left);
+				deltaY = ballSpeed*Math.sin(angle);
+				deltaX = ballSpeed*Math.cos(angle);
 			}
 		}
-	}
-
-	private void checkRight(int rightBorder, int leftBorder, int bottomBorder, int topBorder, int angle) {
-		if(xPosition + diameter + speedX > leftBorder && xPosition + diameter + speedX < rightBorder) {
-			if(yPosition <= bottomBorder && yPosition + diameter >= topBorder) {
-				xPosition = leftBorder - diameter;
-
-				// ball relative to paddle, value is where on paddle the center of ball is
-				double ballValue = (yPosition-(topBorder-diameter)); 	
-				// the angle at which the ball is returned with y + angle (default angle is 30)
-				double returnAngle = (90-angle); // i.e. 60 degrees
-				// half the paddle-height including ball-radius at both ends of paddle
-				double halfPaddleHeight = (bottomBorder-topBorder+diameter)/2; // default: 120/2
-				// set a ratio between angle and paddle-size
-				double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
-				double newYSpeed;
-				if(yPosition+diameter < topBorder+halfPaddleHeight) { // above paddle-center
-					// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
-					// 1<= newYSpeed <= 60
-					newYSpeed = returnAngle-(ballValue*angleHeightRatio);
-					speedY = -Math.sin(Math.toRadians(newYSpeed)); // minus because up is -Y
-				} else if(yPosition > bottomBorder-halfPaddleHeight) { // below paddle-center
-					// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
-					// 1<= newYSpeed <= 60
-					newYSpeed = (-returnAngle)+(ballValue*angleHeightRatio);
-					speedY = Math.sin(Math.toRadians(newYSpeed)); // no minus because up is +Y
-				} else { // dead on center
-					speedY = -speedY; // straight back
-				}
-				speedX = -speedX;
+		edgeOfPaddle = right.getX();
+		// if ball is to the right of right paddle in relation to X-position...
+		if(xPosition + diameter + deltaX >= edgeOfPaddle) {
+			int rightY = right.getY();
+			// ... then check if it is hitting the paddle or not
+			if(yPosition <= rightY + right.getImage().getHeight() && yPosition + diameter >= rightY) {
+				xPosition = edgeOfPaddle - diameter;
+				double angle = getAngleFromPaddle(right);
+				deltaY = ballSpeed*Math.sin(angle);
+				deltaX = -ballSpeed*Math.cos(angle);
 			}
 		}
-	}
-
-	private void checkOutOfBounds(int frameWidth) {
-		if(xPosition - 50 > frameWidth) {
-			//TODO point for left player
-			isServingRight = true;
-			isOutOfBounds = true;
-			return;
-		}
-		if(xPosition + 50 < 0) {
-			//TODO point for right player
-			isServingLeft = true;
-			isOutOfBounds = true;
-			return;
-		}
-	}
-
-	public boolean getIsServingRight(){
-		return isServingRight;
 	}
 	
-	public boolean getIsServingLeft(){
+	private double getAngleFromPaddle(Paddle paddle) {
+		int paddleY = paddle.getY();
+		// ball relative to paddle, value is where on paddle the center of ball is
+		double ballValue = (yPosition-(paddleY-diameter)); 	
+		// the angle at which the ball is returned with angle in relation to Y-axel (default angle is 30)
+		double returnAngle = (90-paddle.getAngle()); // i.e. 60 degrees from X-axel and up to (Y-axel+30)
+		// half the paddle-height including ball-radius at both ends of paddle
+		double halfPaddleHeight = (paddle.getImage().getHeight() + diameter)/2; // default: 120/2
+		// set a ratio between angle and paddle-size
+		double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
+		double angle;
+		if(yPosition+diameter < paddleY+halfPaddleHeight) { // above paddle-center
+			// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
+			// 1<= newYSpeed <= 60
+			angle = -Math.toRadians(returnAngle-(ballValue*angleHeightRatio)); // minus because up is -Y
+		} else if(yPosition > paddleY + halfPaddleHeight) { // below paddle-center
+			// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
+			// 1<= newYSpeed <= 60
+			angle = Math.toRadians((-returnAngle)+(ballValue*angleHeightRatio));
+		} else { // dead on center
+			angle = 0; // straight back
+		}
+		return angle;
+	}
+
+	public boolean checkOutOfBounds(int frameWidth) {
+		if(xPosition - 50 > frameWidth) {
+			isServingRight = true;
+			return true;
+		}
+		if(xPosition + 50 < 0) {
+			isServingLeft = true;
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isServingLeft() {
 		return isServingLeft;
 	}
 	
-	public boolean wasOutOfBounds(){
-		if(isOutOfBounds){
-			return isOutOfBounds;
-		}
-		return false;
+	public boolean isServingRight() {
+		return isServingRight;
 	}
 }

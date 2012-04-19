@@ -74,7 +74,7 @@ public class MainMenuState extends BasicGameState {
 
 		if(input.isKeyDown(Input.KEY_ESCAPE)) 
 			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
-
+		
 		if(input.isKeyDown(Input.KEY_H)) 
 			sbg.enterState(PongGame.HELPSTATE, t, t);
 		
@@ -83,9 +83,9 @@ public class MainMenuState extends BasicGameState {
 				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); 
 		}
 
-		if(pvaiButtonArea.isMouseOver()){ //Gå över till gameplaystate eller twoplayerstate?
+		if(pvaiButtonArea.isMouseOver()){ //Inte implementerat än
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
-				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); 
+				sbg.enterState(PongGame.ONEPLAYER, t, t); 
 			}
 		}
 		
