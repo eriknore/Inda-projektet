@@ -11,8 +11,7 @@ import org.newdawn.slick.state.StateBasedGame;
  */
 public class PongGame extends StateBasedGame {
 	
-    public static final int MAINMENUSTATE = 0;
-    public static final int GAMEPLAYSTATE = 1;
+    public static final int MAINMENUSTATE = 0, GAMEPLAYSTATE = 1, HELPSTATE = 2;
     private static int width = 800, height = 600; // resolution
 	
 	public PongGame() {
@@ -20,6 +19,7 @@ public class PongGame extends StateBasedGame {
 		 
         this.addState(new MainMenuState(MAINMENUSTATE));
         this.addState(new GamePlayState(GAMEPLAYSTATE));
+        this.addState(new HelpState(HELPSTATE));
         this.enterState(MAINMENUSTATE);
 	}
 
@@ -40,5 +40,6 @@ public class PongGame extends StateBasedGame {
  
         this.getState(MAINMENUSTATE).init(gc, this);
         this.getState(GAMEPLAYSTATE).init(gc, this);
+        this.getState(HELPSTATE).init(gc, this);
     }
 }

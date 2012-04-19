@@ -215,16 +215,15 @@ public class Ball {
 			return;
 		}
 	}
-	//lagt till dessa nedan (kolla playerScore i GamePlayState)
-	//lagt till en instansvariabel isOutOfBounds, som ändras i checkOutOfBounds och moveBall
-	//vet inte om det är snyggaste lösningen?? försökte hålla det så Ball'igt som möjligt
-	//radera detta när du har läst :)
+
 	public boolean getIsServingRight(){
 		return isServingRight;
 	}
+	
 	public boolean getIsServingLeft(){
 		return isServingLeft;
 	}
+	
 	public boolean wasOutOfBounds(){
 		if(isOutOfBounds){
 			return isOutOfBounds;

@@ -11,6 +11,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeOutTransition;
+import org.newdawn.slick.state.transition.SelectTransition;
 import org.newdawn.slick.state.transition.Transition;
 
 /**
@@ -66,7 +67,7 @@ public class GamePlayState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
-
+		
 		// Necessary coordinates for collision-control of ball
 		HashMap<String, Integer> currentState = new HashMap<String, Integer>();
 		currentState.put("pLeftX", paddleLeftXPosition);
@@ -79,16 +80,18 @@ public class GamePlayState extends BasicGameState {
 		currentState.put("frameWidth", width);
 		currentState.put("angle", paddleLeft.getAngle());
 		float speed = delta/4;
+		Transition t = new FadeOutTransition();
 
 		ball.moveBall(currentState, speed);
 
 
 		Input input = container.getInput();
 
-		if(input.isKeyDown(Input.KEY_ESCAPE)) {
-			Transition t = new FadeOutTransition();
+		if(input.isKeyDown(Input.KEY_ESCAPE)) 
 			sbg.enterState(PongGame.MAINMENUSTATE, t, t);
-		}
+
+		if(input.isKeyDown(Input.KEY_H)) 
+			sbg.enterState(PongGame.HELPSTATE, t, t);	
 
 		if(input.isKeyDown(Input.KEY_W))
 			paddleLeft.paddleUp(speed);
@@ -120,15 +123,13 @@ public class GamePlayState extends BasicGameState {
 		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
 		ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
 
-		g.drawString("" + rightScore, 500, 30);
-		g.drawString("" + leftScore, 300, 30);
+		g.drawString("" + rightScore, 500, 40);
+		g.drawString("" + leftScore, 300, 40);
+		g.drawString("Press 'H' for help", width-200, height-30);
 		
 
 	}
 	
-	// lagt till denna metod nedan, två drawstrings ovan,, som vi kan byta plats/storlek på. 
-	//och sista ifsatsen i update()
-	//radera detta när du har läst :)
 	/**
 	 * 
 	 */
