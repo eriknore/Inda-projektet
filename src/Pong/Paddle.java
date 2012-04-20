@@ -10,7 +10,7 @@ import org.newdawn.slick.SlickException;
  */
 public class Paddle {
 
-	private int yPosition, xPosition, frameHeight, AIdelay = 0;
+	private int yPosition, xPosition, frameHeight, AIdelay = 0, goal = 300;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
 	private final int angle = 30, paddleSpeed = 3;
@@ -79,25 +79,65 @@ public class Paddle {
 		return angle;
 	}
 	
-	public void getAIMovement(Ball ball, float timeDelta) {
+	public void getAIMovement(Ball ball, float timeDelta, Paddle otherPaddle) {
 		int ballPosition = ball.getYPosition();
 		int paddleCenter = yPosition + paddleImage.getHeight()/2;
 		if(ball.isServingLeft()) {
-			if(AIdelay > 40) {
+			if(AIdelay > 20) {
 				ball.servedLeft();
 				AIdelay = 0;
 				return;
 			}
 			yPosition -= timeDelta*paddleSpeed;
 			AIdelay++;
-		} else if(ballPosition - 5 > paddleCenter) {
+			return;
+		} else if(ball.isServingRight()) {
+				if(AIdelay > 20) {
+					ball.servedRight();
+					AIdelay = 0;
+					return;
+				}
+				yPosition -= timeDelta*paddleSpeed;
+				AIdelay++;
+				return;
+		} else if(ballPosition + 5 > paddleCenter - 30) {
 			yPosition += timeDelta*paddleSpeed;
-		} else if(ballPosition + 5 < paddleCenter){
+		} else if(ballPosition - 5 < paddleCenter - 30){
 			yPosition -= timeDelta*paddleSpeed;
 		}
+		
+//		if(ball.getDeltaX() > 0)
+//			goal = calculateBall(ball);
+//		if(yPosition > goal) {
+//			yPosition -= timeDelta*paddleSpeed;
+//		} else if(yPosition < goal) {
+//			yPosition += timeDelta*paddleSpeed;
+//		}
 	}
 	
 	public boolean isHuman() {
 		return isHuman;
+	}
+	
+	private int calculateBall(Ball ball) {
+		double ballY = ball.getYPosition();
+		double ballDeltaY = ball.getDeltaY();
+		double ballX = ball.getXPosition();
+		double ballDeltaX = ball.getDeltaX();
+		double totalDistance;
+		if(ballDeltaY == 0) {
+			totalDistance = ballX*ballDeltaX;
+		} else {
+			totalDistance = ballX*ballDeltaX/ballDeltaY;
+		}
+		double distanceToWall = frameHeight-ballY+ball.getImage().getWidth();
+		totalDistance =- distanceToWall;
+		int height = PongGame.getHeight();
+		while(totalDistance > height) {
+			totalDistance -= height;
+		//	oddsOrEven++;
+		}
+		Double toReturn = totalDistance;
+		return toReturn.intValue();
 	}
 }

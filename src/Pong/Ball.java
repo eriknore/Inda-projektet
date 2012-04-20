@@ -184,4 +184,12 @@ public class Ball {
 	public boolean isServingRight() {
 		return isServingRight;
 	}
+	
+	public double getDeltaY() {
+		return deltaY;
+	}
+	
+	public double getDeltaX() {
+		return deltaX;
+	}
 }

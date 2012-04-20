@@ -47,4 +47,12 @@ public class PongGame extends StateBasedGame {
         this.getState(ONEPLAYER).init(gc, this);
         this.getState(TWOPLAYER).init(gc, this);
     }
+	
+	public static int getWidth() {
+		return width;
+	}
+	
+	public static int getHeight() {
+		return height;
+	}
 }

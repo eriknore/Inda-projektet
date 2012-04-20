@@ -51,9 +51,9 @@ public class GamePlayState extends BasicGameState {
 		height = container.getHeight();
 		width = container.getWidth();
 		background = new Image("data/backgrounds/default.png");
-		paddleLeft = new Paddle(height, paddleLeftXPosition, false); // both paddles start at same y-position
+		paddleLeft = new Paddle(height, paddleLeftXPosition, true); // both paddles start at same y-position
 		paddleRightXPosition = width-paddleLeftXPosition-paddleLeft.getImage().getWidth();
-		paddleRight = new Paddle(height, paddleRightXPosition, true);
+		paddleRight = new Paddle(height, paddleRightXPosition, false);
 		// mirror the startposition of paddle1
 		ball = new Ball();
 	}
@@ -92,10 +92,10 @@ public class GamePlayState extends BasicGameState {
 			ball.servedRight();
 		
 		if(!paddleLeft.isHuman())
-			paddleLeft.getAIMovement(ball, timeDelta);
+			paddleLeft.getAIMovement(ball, timeDelta, paddleRight);
 		
 		if(!paddleRight.isHuman())
-			paddleRight.getAIMovement(ball, timeDelta);
+			paddleRight.getAIMovement(ball, timeDelta, paddleLeft);
 		
 		ball.moveBall(paddleLeft, paddleRight, height, timeDelta);
 		
