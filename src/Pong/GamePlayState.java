@@ -73,29 +73,30 @@ public class GamePlayState extends BasicGameState {
 		if(input.isKeyDown(Input.KEY_H)) 
 			sbg.enterState(PongGame.HELPSTATE, t, t);	
 
-		if(input.isKeyDown(Input.KEY_W))
+		if(paddleLeft.isHuman()) {
+			if(input.isKeyDown(Input.KEY_W))
 			paddleLeft.paddleUp(timeDelta);
 
-		if(input.isKeyDown(Input.KEY_S))
-			paddleLeft.paddleDown(timeDelta);
+			if(input.isKeyDown(Input.KEY_S))
+				paddleLeft.paddleDown(timeDelta);
 
-		if(input.isKeyDown(Input.KEY_D))
-			ball.servedLeft();
-
-		if(input.isKeyDown(Input.KEY_UP))
-			paddleRight.paddleUp(timeDelta);
-
-		if(input.isKeyDown(Input.KEY_DOWN))
-			paddleRight.paddleDown(timeDelta);
-
-		if(input.isKeyDown(Input.KEY_LEFT))
-			ball.servedRight();
-		
-		if(!paddleLeft.isHuman())
+			if(input.isKeyDown(Input.KEY_D))
+				ball.serve(paddleLeft, paddleRight);
+		} else {
 			paddleLeft.getAIMovement(ball, timeDelta, paddleRight);
-		
-		if(!paddleRight.isHuman())
+		}
+		if(paddleRight.isHuman()) {
+			if(input.isKeyDown(Input.KEY_UP))
+				paddleRight.paddleUp(timeDelta);
+
+			if(input.isKeyDown(Input.KEY_DOWN))
+				paddleRight.paddleDown(timeDelta);
+
+			if(input.isKeyDown(Input.KEY_LEFT))
+				ball.serve(paddleLeft, paddleRight);
+		} else { 
 			paddleRight.getAIMovement(ball, timeDelta, paddleLeft);
+		}
 		
 		ball.moveBall(paddleLeft, paddleRight, height, timeDelta);
 		

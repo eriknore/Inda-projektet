@@ -82,18 +82,18 @@ public class Paddle {
 	public void getAIMovement(Ball ball, float timeDelta, Paddle otherPaddle) {
 		int ballPosition = ball.getYPosition();
 		int paddleCenter = yPosition + paddleImage.getHeight()/2;
-		if(ball.isServingLeft()) {
+		if(ball.isServingLeft() && !isHuman) {
 			if(AIdelay > 20) {
-				ball.servedLeft();
+				ball.serve(this, otherPaddle);
 				AIdelay = 0;
 				return;
 			}
 			yPosition -= timeDelta*paddleSpeed;
 			AIdelay++;
 			return;
-		} else if(ball.isServingRight()) {
+		} else if(ball.isServingRight() && !isHuman) {
 				if(AIdelay > 20) {
-					ball.servedRight();
+					ball.serve(otherPaddle, this);
 					AIdelay = 0;
 					return;
 				}
