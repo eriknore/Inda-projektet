@@ -10,7 +10,11 @@ import org.newdawn.slick.gui.MouseOverArea;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import org.newdawn.slick.state.transition.BlobbyTransition;
+import org.newdawn.slick.state.transition.CombinedTransition;
+import org.newdawn.slick.state.transition.CrossStateTransition;
 import org.newdawn.slick.state.transition.FadeOutTransition;
+import org.newdawn.slick.state.transition.HorizontalSplitTransition;
 import org.newdawn.slick.state.transition.SelectTransition;
 import org.newdawn.slick.state.transition.Transition;
 /**
@@ -23,11 +27,12 @@ public class MainMenuState extends BasicGameState {
 	private int stateID = -1;
     private static int width = 800, height = 600; // resolution
     
-	private Image menuBackground, pvpButton, pvaiButton, scoreButton, optionsButton, quitButton;
+	private Image menuBackground, pvpButton, pvaiButton, scoreButton, optionsButton, quitButton, difficultyMenu;
 
 	private int firstMenuButtonX = 80; 
 	private int firstMenuButtonY = 50;
-	private MouseOverArea pvpButtonArea, pvaiButtonArea, scoreButtonArea, optionsButtonArea, quitButtonArea; 
+	private MouseOverArea pvpButtonArea, pvaiButtonArea, scoreButtonArea, optionsButtonArea, quitButtonArea;
+	private boolean choosingDifficulty; 
 
 	public MainMenuState(int stateID) {
 		this.stateID = stateID; 
@@ -39,6 +44,7 @@ public class MainMenuState extends BasicGameState {
 		pvpButton = new Image("data/menu/playervsplayer.png");
 		pvaiButton = new Image("data/menu/playervsai.png");
 		quitButton = new Image("data/menu/quitgame.png");
+		difficultyMenu = new Image("data/menu/difficultychoose.png");
 
 		pvpButtonArea = new MouseOverArea(gc, pvpButton, firstMenuButtonX, firstMenuButtonY);
 		pvaiButtonArea = new MouseOverArea(gc, pvpButton, firstMenuButtonX, firstMenuButtonY + 80);
@@ -52,7 +58,17 @@ public class MainMenuState extends BasicGameState {
 		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
 		g.drawString("Press 'H' for help", width-200, height-30);
 		buttonVisualEffect();
+		
+		if(choosingDifficulty){
+			difficultyMenu();
+		}
 	}
+
+	private void difficultyMenu() {
+		difficultyMenu.draw(width/2, height/4);
+		
+	}
+
 
 	/**
 	 * Temporarly decreases the button's scale if
@@ -85,12 +101,10 @@ public class MainMenuState extends BasicGameState {
 
 		if(pvaiButtonArea.isMouseOver()){ //Inte implementerat än
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
-				sbg.enterState(PongGame.ONEPLAYER, t, t); 
+				choosingDifficulty = true;
 			}
 		}
-		
-
-		
+				
 		if(quitButtonArea.isMouseOver()){
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
 				gc.exit();
