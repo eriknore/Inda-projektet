@@ -10,6 +10,13 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.Transition;
 
+/**
+ * A stateclass representing the help window.
+ * Used when the player presses the 'H' button
+ * during the gameplay.
+ * @author Erik Norell & Daniel Aceituno
+ * @version 2012-04-23
+ */
 public class HelpState extends BasicGameState {
 
 	private int stateID = -1;
@@ -36,11 +43,17 @@ public class HelpState extends BasicGameState {
 		int y = 50;
 		
 		g.drawString("Right Player controls: ", rightLineX, y);
-		g.drawString("blaaablaaa", rightLineX, y+50);
+		g.drawString("Move up: Up Arrow", rightLineX, y+50);
+		g.drawString("Move down: Down Arrow", rightLineX, y+100);
+		g.drawString("Serve: Left Arrow", rightLineX, y+150);
+		g.drawString("Use Weapon: Left Arrow", rightLineX, y+200);
 		g.drawString("Left Player controls: ", leftLineX, y);
-		g.drawString("blaaaablaaa", leftLineX, y+50);
+		g.drawString("Move up: W", leftLineX, y+50);
+		g.drawString("Move down: S", leftLineX, y+100);
+		g.drawString("Serve: D", leftLineX, y+150);
+		g.drawString("Use Weapon: D", leftLineX, y+200);
 		
-		g.drawString("Press 'H' to return", width-200, height-30); //returnar inte till menyn dock, skippa?
+		g.drawString("Press 'H' to return", width-200, height-30); 
 	}
 
 	@Override

@@ -7,12 +7,12 @@ import org.newdawn.slick.state.StateBasedGame;
 
 /**
  * @author Erik Norell & Daniel Aceituno
- * @version 2012-04-16
+ * @version 2012-04-23
  */
 public class PongGame extends StateBasedGame {
 	
     public static final int MAINMENUSTATE = 0, GAMEPLAYSTATE = 1, HELPSTATE = 2,
-    		ONEPLAYER = 3, TWOPLAYER = 4;
+    		ONEPLAYER = 3, TWOPLAYER = 4, DIFFICULTYMENU = 5;
     private static int width = 800, height = 600; // resolution
 	
 	public PongGame() {
@@ -21,9 +21,10 @@ public class PongGame extends StateBasedGame {
         this.addState(new MainMenuState(MAINMENUSTATE));
         this.addState(new GamePlayState(GAMEPLAYSTATE));
         this.addState(new HelpState(HELPSTATE));
-        this.addState(new HelpState(ONEPLAYER));
-        this.addState(new HelpState(TWOPLAYER));
-        this.enterState(MAINMENUSTATE);
+        this.addState(new GamePlayState(ONEPLAYER));
+        this.addState(new GamePlayState(TWOPLAYER));
+        this.addState(new DifficultyMenuState(DIFFICULTYMENU));
+        this.enterState(MAINMENUSTATE); // State to enter at runtime.
 	}
 
 	public static void main(String[] args) {
@@ -35,8 +36,10 @@ public class PongGame extends StateBasedGame {
 			e.printStackTrace();
 		}
 	}
+	
 	/**
-	 * 
+	 * Initiates the game's states and adds
+	 * them to the same GameContainer.
 	 */
 	@Override
     public void initStatesList(GameContainer gc) throws SlickException {
@@ -46,6 +49,7 @@ public class PongGame extends StateBasedGame {
         this.getState(HELPSTATE).init(gc, this);
         this.getState(ONEPLAYER).init(gc, this);
         this.getState(TWOPLAYER).init(gc, this);
+        this.getState(DIFFICULTYMENU).init(gc, this);
     }
 	
 	public static int getWidth() {
