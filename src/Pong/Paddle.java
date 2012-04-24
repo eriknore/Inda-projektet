@@ -13,7 +13,7 @@ public class Paddle {
 	private int yPosition, xPosition, frameHeight, AIdelay = 0, goal = 300;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
-	private final int angle = 30, paddleSpeed = 3;
+	private final int angle = 30, paddleSpeed = 2;
 	private boolean isHuman;
 
 	/**

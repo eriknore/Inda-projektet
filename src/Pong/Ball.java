@@ -20,7 +20,7 @@ public class Ball {
 	public Ball() throws SlickException {
 		ballImage = new Image("data/ball/default.png");
 		diameter = ballImage.getWidth();
-		ballSpeed = 8;
+		ballSpeed = 4;
 
 		// simulate a coinflip to decide which player to serve
 		Random rand = new Random();

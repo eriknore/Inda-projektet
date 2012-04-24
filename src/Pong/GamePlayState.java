@@ -66,8 +66,10 @@ public class GamePlayState extends BasicGameState {
 			throws SlickException {
 		
 		updateInterval += delta;
+		int limit = 8;
+		if(updateInterval < limit)
+			return;
 		
-//		float timeDelta = delta/10;
 		Transition t = new FadeOutTransition();
 		
 		Input input = container.getInput();
@@ -99,9 +101,6 @@ public class GamePlayState extends BasicGameState {
 				ball.serveRight(paddleRight);
 		}
 		
-		if(updateInterval < 10)
-			return;
-		
 		if(!paddleRight.isHuman()) {
 			getAIEasy(paddleRight);
 		} else if (!paddleLeft.isHuman()) {
@@ -113,7 +112,7 @@ public class GamePlayState extends BasicGameState {
 		if(ball.checkOutOfBounds(width))
 			playerScore();
 		
-		updateInterval -= 10;
+		updateInterval -= limit;
 	}
 
 	@Override
