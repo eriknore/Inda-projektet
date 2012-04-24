@@ -20,7 +20,7 @@ public class Ball {
 	public Ball() throws SlickException {
 		ballImage = new Image("data/ball/default.png");
 		diameter = ballImage.getWidth();
-		ballSpeed = 4;
+		ballSpeed = 8;
 
 		// simulate a coinflip to decide which player to serve
 		Random rand = new Random();
@@ -79,26 +79,6 @@ public class Ball {
 		yPosition += deltaY;
 		xPosition += deltaX;
 		return;
-	}
-
-	public void serveLeft(Paddle left) {
-		if(isServingLeft) {
-			deltaX = ballSpeed;
-			deltaY = 0;
-			xPosition = left.getX() + left.getImage().getWidth();
-			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
-			isServingLeft= false;
-		}
-	}
-	
-	public void serveRight(Paddle right) {
-		if(isServingRight) {
-			deltaX = -ballSpeed;
-			deltaY = 0;
-			xPosition = right.getX() - diameter;
-			yPosition = right.getY() +(right.getImage().getHeight()-diameter)/2;
-			isServingRight = false;
-		}
 	}
 
 	private void checkWalls(int frameHeight) {
@@ -195,4 +175,12 @@ public class Ball {
 	public double getDeltaX() {
 		return deltaX;
 	}
+	
+	public void serve(int direction) {
+		deltaX = direction*ballSpeed;
+		deltaY = 0;
+		isServingLeft = false;
+		isServingRight = false;
+	}
+
 }

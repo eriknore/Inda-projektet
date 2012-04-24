@@ -20,6 +20,8 @@ import org.newdawn.slick.state.transition.Transition;
  * @version 2012-04-16
  */
 public class GamePlayState extends BasicGameState {
+	
+	private static final boolean DEBUG = false;
 
 	private int stateID = -1;
 	private Image background;
@@ -33,6 +35,8 @@ public class GamePlayState extends BasicGameState {
 
 	private int leftScore = 0;
 	private int rightScore = 0;
+	
+	private int AIDelay = 0;
 
 	
 	public GamePlayState(int stateID) {
@@ -54,9 +58,9 @@ public class GamePlayState extends BasicGameState {
 		height = container.getHeight();
 		width = container.getWidth();
 		background = new Image("data/backgrounds/default.png");
-		paddleLeft = new Paddle(height, paddleLeftXPosition, true); // both paddles start at same y-position
+		paddleLeft = new Paddle(height, paddleLeftXPosition, false); // both paddles start at same y-position
 		paddleRightXPosition = width-paddleLeftXPosition-paddleLeft.getImage().getWidth();
-		paddleRight = new Paddle(height, paddleRightXPosition, true);
+		paddleRight = new Paddle(height, paddleRightXPosition, false);
 		// mirror the startposition of paddle1
 		ball = new Ball();
 	}
@@ -66,7 +70,7 @@ public class GamePlayState extends BasicGameState {
 			throws SlickException {
 		
 		updateInterval += delta;
-		int limit = 8;
+		int limit = 20;
 		if(updateInterval < limit)
 			return;
 		
@@ -87,8 +91,8 @@ public class GamePlayState extends BasicGameState {
 			if(input.isKeyDown(Input.KEY_S))
 				paddleLeft.paddleDown();
 
-			if(input.isKeyDown(Input.KEY_D))
-				ball.serveLeft(paddleLeft);
+			if(input.isKeyDown(Input.KEY_D) && ball.isServingLeft())
+				paddleLeft.serve(ball);
 		}
 		if(paddleRight.isHuman()) {
 			if(input.isKeyDown(Input.KEY_UP))
@@ -97,13 +101,14 @@ public class GamePlayState extends BasicGameState {
 			if(input.isKeyDown(Input.KEY_DOWN))
 				paddleRight.paddleDown();
 
-			if(input.isKeyDown(Input.KEY_LEFT))
-				ball.serveRight(paddleRight);
+			if(input.isKeyDown(Input.KEY_LEFT) && ball.isServingRight())
+				paddleRight.serve(ball);
 		}
 		
 		if(!paddleRight.isHuman()) {
 			getAIEasy(paddleRight);
-		} else if (!paddleLeft.isHuman()) {
+		}
+		if (!paddleLeft.isHuman()) {
 			getAIEasy(paddleLeft);
 		}
 		
@@ -127,6 +132,29 @@ public class GamePlayState extends BasicGameState {
 		g.drawString("" + leftScore, 300, 40);
 		g.drawString("Press 'H' for help", width-200, height-30);
 		
+		if(DEBUG) {
+//			double deltaX = ball.getDeltaX();
+//			double deltaY = ball.getDeltaY();
+//			g.drawString("Delta X =" + deltaX, 100, 100);
+//			g.drawString("Delta Y=" + deltaY, 500, 100);
+//			g.drawString("Vector value: " + Math.hypot(deltaX, deltaY), 220, 120);
+//			g.drawString("UpsateInterval: " + updateInterval, 500, 120);
+			g.drawString("X:" + paddleLeft.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 100, 100);
+			g.drawString("X:" + paddleLeft.getX() + " > " + width/2 + " && " + ball.isServingRight(), 100, 120);
+			g.drawString("X:" + paddleRight.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 500, 100);
+			g.drawString("X:" + paddleRight.getX() + " > " + width/2 + " && " + ball.isServingRight(), 500, 120);
+			g.drawString("Left goal: " + paddleLeft.getGoal(), 100, 140);
+			g.drawString("Right goal: " + paddleRight.getGoal(), 500, 140);
+			
+			int paddleHeight = paddleLeft.getImage().getHeight();
+			int centerOfPaddle = paddleLeft.getY() + paddleHeight/2 + paddleLeft.getImage().getWidth()/2;
+			g.drawString("" + centerOfPaddle, 250, 140);
+			paddleHeight = paddleRight.getImage().getHeight();
+			centerOfPaddle = paddleRight.getY() + paddleHeight/2 + paddleRight.getImage().getWidth()/2;
+			g.drawString("" + centerOfPaddle, 650, 140);
+			
+		}
+		
 
 	}
 	
@@ -142,11 +170,28 @@ public class GamePlayState extends BasicGameState {
 	}
 	
 	private void getAIEasy(Paddle paddle) {
-		Random rand = new Random();
-		int centerOfPaddle = paddle.getY() + paddle.getImage().getHeight()/2;
-		if(centerOfPaddle > paddle.getGoal())
-			paddle.paddleUp();
+		int paddleX = paddle.getX();
+		if((paddleX < width/2 && ball.isServingLeft()) || (paddleX > width/2 && ball.isServingRight())) {
+			AIDelay += updateInterval;
+			if(AIDelay > 2000) {
+				paddle.serve(ball);
+				AIDelay = 0;
+			}
+		}
 		
-		int goal;
+		int paddleHeight = paddle.getImage().getHeight();
+		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
+		int currentGoal = paddle.getGoal();
+		if(centerOfPaddle + 5 >= currentGoal && centerOfPaddle - 5 <= currentGoal) { 
+			Random rand = new Random();
+			int goal = rand.nextInt(height-paddleHeight);
+			paddle.setGoal(goal+paddleHeight/2);
+			return;
+		}
+		if(centerOfPaddle > currentGoal) {
+			paddle.paddleUp();
+		} else if(centerOfPaddle < currentGoal) {
+			paddle.paddleDown();
+		}
 	}
 }
