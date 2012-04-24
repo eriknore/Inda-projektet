@@ -49,21 +49,19 @@ public class Paddle {
 	/**
 	 *  Moves the paddle up
 	 */
-	public void paddleUp(float timeDelta) {
-		float delta = timeDelta*paddleSpeed;
+	public void paddleUp() {
 		if(yPosition <= 0)
-			yPosition += delta; // stops paddle from exiting screen
-		yPosition -= delta;
+			yPosition += paddleSpeed; // stops paddle from exiting screen
+		yPosition -= paddleSpeed;
 	}
 
 	/**
 	 *  Moves the paddle down
 	 */
-	public void paddleDown(float timeDelta) {
-		float delta = timeDelta*paddleSpeed;
+	public void paddleDown() {
 		if(yPosition >= frameHeight-paddleImage.getHeight())
-			yPosition -= delta; // stops paddle from exiting screen
-		yPosition += delta;
+			yPosition -= paddleSpeed; // stops paddle from exiting screen
+		yPosition += paddleSpeed;
 	}
 	
 	/**
@@ -79,33 +77,38 @@ public class Paddle {
 		return angle;
 	}
 	
-	public void getAIMovement(Ball ball, float timeDelta, Paddle otherPaddle) {
-		int ballPosition = ball.getYPosition();
-		int paddleCenter = yPosition + paddleImage.getHeight()/2;
-		if(ball.isServingLeft() && !isHuman) {
-			if(AIdelay > 20) {
-				ball.serve(this, otherPaddle);
-				AIdelay = 0;
-				return;
-			}
-			yPosition -= timeDelta*paddleSpeed;
-			AIdelay++;
-			return;
-		} else if(ball.isServingRight() && !isHuman) {
-				if(AIdelay > 20) {
-					ball.serve(otherPaddle, this);
-					AIdelay = 0;
-					return;
-				}
-				yPosition -= timeDelta*paddleSpeed;
-				AIdelay++;
-				return;
-		} else if(ballPosition + 5 > paddleCenter - 30) {
-			yPosition += timeDelta*paddleSpeed;
-		} else if(ballPosition - 5 < paddleCenter - 30){
-			yPosition -= timeDelta*paddleSpeed;
-		}
-		
+//	public void getAIMovement(Ball ball, float timeDelta, Paddle otherPaddle) {
+//		int ballPosition = ball.getYPosition();
+//		int paddleCenter = yPosition + paddleImage.getHeight()/2;
+//		int middle = PongGame.getWidth()/2;
+//		if(yPosition < middle) {
+//			if(isHuman && ball.isServingLeft()) {
+//				if(AIdelay > 20) {
+//					ball.serveLeft(this);
+//					AIdelay = 0;
+//					return;
+//				}
+//				yPosition -= timeDelta*paddleSpeed;
+//				AIdelay++;
+//				return;
+//			}
+//		} else if(yPosition > middle) {
+//			if(isHuman && ball.isServingRight()) {
+//				if(AIdelay > 20) {
+//					ball.serveRight(this);
+//					AIdelay = 0;
+//					return;
+//				}
+//				yPosition -= timeDelta*paddleSpeed;
+//				AIdelay++;
+//				return;
+//			}
+//		}
+//		if(ballPosition + 5 > paddleCenter - 30)
+//			yPosition += timeDelta*paddleSpeed;
+//		if(ballPosition - 5 < paddleCenter - 30)
+//			yPosition -= timeDelta*paddleSpeed;
+//		
 //		if(ball.getDeltaX() > 0)
 //			goal = calculateBall(ball);
 //		if(yPosition > goal) {
@@ -113,7 +116,7 @@ public class Paddle {
 //		} else if(yPosition < goal) {
 //			yPosition += timeDelta*paddleSpeed;
 //		}
-	}
+//	}
 	
 	public boolean isHuman() {
 		return isHuman;
@@ -139,5 +142,13 @@ public class Paddle {
 		}
 		Double toReturn = totalDistance;
 		return toReturn.intValue();
+	}
+	
+	public void setGoal(int goal) {
+		this.goal = goal;
+	}
+	
+	public int getGoal() {
+		return goal;
 	}
 }

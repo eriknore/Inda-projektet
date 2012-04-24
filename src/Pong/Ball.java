@@ -63,7 +63,7 @@ public class Ball {
 	 * @param bottomWall
 	 * @return
 	 */
-	public void moveBall(Paddle left, Paddle right, int frameHeight, float deltaTime) {
+	public void moveBall(Paddle left, Paddle right, int frameHeight) {
 		if(isServingLeft) {
 			xPosition = left.getX() + left.getImage().getWidth();
 			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
@@ -76,19 +76,27 @@ public class Ball {
 		}
 		checkWalls(frameHeight);
 		checkPaddles(left, right);
-		yPosition += deltaY*deltaTime;
-		xPosition += deltaX*deltaTime;
+		yPosition += deltaY;
+		xPosition += deltaX;
 		return;
 	}
 
-	public void serve(Paddle left, Paddle right) {
-		if(isServingLeft) { 
+	public void serveLeft(Paddle left) {
+		if(isServingLeft) {
 			deltaX = ballSpeed;
 			deltaY = 0;
+			xPosition = left.getX() + left.getImage().getWidth();
+			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
 			isServingLeft= false;
-		} else if(isServingRight) {
+		}
+	}
+	
+	public void serveRight(Paddle right) {
+		if(isServingRight) {
 			deltaX = -ballSpeed;
 			deltaY = 0;
+			xPosition = right.getX() - diameter;
+			yPosition = right.getY() +(right.getImage().getHeight()-diameter)/2;
 			isServingRight = false;
 		}
 	}
@@ -111,7 +119,7 @@ public class Ball {
 	private void checkPaddles(Paddle left, Paddle right) {
 		int edgeOfPaddle = left.getX() + left.getImage().getWidth();
 		// if ball is to the left of left paddle in relation to X-position...
-		if(xPosition + deltaX <= edgeOfPaddle) {
+		if(xPosition + deltaX <= edgeOfPaddle && xPosition + diameter + deltaX >= left.getX()) {
 			int leftY = left.getY();
 			// ... then check if it is hitting the paddle or not
 			if(yPosition <= leftY + left.getImage().getHeight() && yPosition + diameter >= leftY) {
@@ -123,7 +131,7 @@ public class Ball {
 		}
 		edgeOfPaddle = right.getX();
 		// if ball is to the right of right paddle in relation to X-position...
-		if(xPosition + diameter + deltaX >= edgeOfPaddle) {
+		if(xPosition + diameter + deltaX >= edgeOfPaddle && xPosition + deltaX <= edgeOfPaddle + right.getImage().getWidth()) {
 			int rightY = right.getY();
 			// ... then check if it is hitting the paddle or not
 			if(yPosition <= rightY + right.getImage().getHeight() && yPosition + diameter >= rightY) {

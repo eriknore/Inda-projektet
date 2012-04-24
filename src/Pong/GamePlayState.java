@@ -2,6 +2,8 @@ package Pong;
 
 
 
+import java.util.Random;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -27,6 +29,7 @@ public class GamePlayState extends BasicGameState {
 	private int paddleRightXPosition;
 	private Paddle paddleLeft, paddleRight;
 	private Ball ball;
+	private int updateInterval = 0;
 
 	private int leftScore = 0;
 	private int rightScore = 0;
@@ -53,7 +56,7 @@ public class GamePlayState extends BasicGameState {
 		background = new Image("data/backgrounds/default.png");
 		paddleLeft = new Paddle(height, paddleLeftXPosition, true); // both paddles start at same y-position
 		paddleRightXPosition = width-paddleLeftXPosition-paddleLeft.getImage().getWidth();
-		paddleRight = new Paddle(height, paddleRightXPosition, false);
+		paddleRight = new Paddle(height, paddleRightXPosition, true);
 		// mirror the startposition of paddle1
 		ball = new Ball();
 	}
@@ -62,7 +65,9 @@ public class GamePlayState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
 		
-		float timeDelta = delta/10;
+		updateInterval += delta;
+		
+//		float timeDelta = delta/10;
 		Transition t = new FadeOutTransition();
 		
 		Input input = container.getInput();
@@ -75,33 +80,40 @@ public class GamePlayState extends BasicGameState {
 
 		if(paddleLeft.isHuman()) {
 			if(input.isKeyDown(Input.KEY_W))
-			paddleLeft.paddleUp(timeDelta);
+			paddleLeft.paddleUp();
 
 			if(input.isKeyDown(Input.KEY_S))
-				paddleLeft.paddleDown(timeDelta);
+				paddleLeft.paddleDown();
 
 			if(input.isKeyDown(Input.KEY_D))
-				ball.serve(paddleLeft, paddleRight);
-		} else {
-			paddleLeft.getAIMovement(ball, timeDelta, paddleRight);
+				ball.serveLeft(paddleLeft);
 		}
 		if(paddleRight.isHuman()) {
 			if(input.isKeyDown(Input.KEY_UP))
-				paddleRight.paddleUp(timeDelta);
+				paddleRight.paddleUp();
 
 			if(input.isKeyDown(Input.KEY_DOWN))
-				paddleRight.paddleDown(timeDelta);
+				paddleRight.paddleDown();
 
 			if(input.isKeyDown(Input.KEY_LEFT))
-				ball.serve(paddleLeft, paddleRight);
-		} else { 
-			paddleRight.getAIMovement(ball, timeDelta, paddleLeft);
+				ball.serveRight(paddleRight);
 		}
 		
-		ball.moveBall(paddleLeft, paddleRight, height, timeDelta);
+		if(updateInterval < 10)
+			return;
+		
+		if(!paddleRight.isHuman()) {
+			getAIEasy(paddleRight);
+		} else if (!paddleLeft.isHuman()) {
+			getAIEasy(paddleLeft);
+		}
+		
+		ball.moveBall(paddleLeft, paddleRight, height);
 		
 		if(ball.checkOutOfBounds(width))
 			playerScore();
+		
+		updateInterval -= 10;
 	}
 
 	@Override
@@ -128,6 +140,14 @@ public class GamePlayState extends BasicGameState {
 		}else{
 			rightScore++;
 		}
-
+	}
+	
+	private void getAIEasy(Paddle paddle) {
+		Random rand = new Random();
+		int centerOfPaddle = paddle.getY() + paddle.getImage().getHeight()/2;
+		if(centerOfPaddle > paddle.getGoal())
+			paddle.paddleUp();
+		
+		int goal;
 	}
 }
