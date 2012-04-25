@@ -20,7 +20,6 @@ import org.newdawn.slick.state.transition.Transition;
 public class DifficultyMenuState extends BasicGameState {
 	
 	private int stateID = -1;
-	private static int width = 800, height = 600; // Resolution
 	private Image difficultyMenu, menuBackground, easy, medium, hard, cancel;
 	private int firstMenuButtonX = 215; // [Easy] button
 	private int firstMenuButtonY = 220;
@@ -53,18 +52,24 @@ public class DifficultyMenuState extends BasicGameState {
 		Transition t = new FadeOutTransition();
 		
 		if(easyArea.isMouseOver()){
-			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
-				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);  //Skicka något innan? som static PCpaddelEasy= true;
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				Settings.setDifficulty("Easy");
+				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+			}
 		}
 		
 		if(mediumArea.isMouseOver()){
-			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				Settings.setDifficulty("Medium");
 				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+			}
 		}
 		
 		if(hardArea.isMouseOver()){
-			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				Settings.setDifficulty("Hard");
 				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+			}
 		}
 		
 		if(cancelArea.isMouseOver()) {
@@ -80,7 +85,7 @@ public class DifficultyMenuState extends BasicGameState {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g)
 			throws SlickException {
 		menuBackground.draw(0, 0);
-		difficultyMenu.draw(width/4, height/4);
+		difficultyMenu.draw(Settings.getFrameWidth()/4, Settings.getFrameHeight()/4);
 		easy.draw(firstMenuButtonX, firstMenuButtonY);
 		medium.draw(firstMenuButtonX + 110, firstMenuButtonY);
 		hard.draw(firstMenuButtonX + 220, firstMenuButtonY);

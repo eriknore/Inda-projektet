@@ -13,7 +13,6 @@ public class PongGame extends StateBasedGame {
 	
     public static final int MAINMENUSTATE = 0, GAMEPLAYSTATE = 1, HELPSTATE = 2,
     		ONEPLAYER = 3, TWOPLAYER = 4, DIFFICULTYMENU = 5;
-    private static int width = 800, height = 600; // resolution
 	
 	public PongGame() {
 		super("Pong");
@@ -30,7 +29,7 @@ public class PongGame extends StateBasedGame {
 	public static void main(String[] args) {
 		try {
 			AppGameContainer app = new AppGameContainer(new PongGame());
-			app.setDisplayMode(width, height, false);
+			app.setDisplayMode(Settings.getFrameWidth(), Settings.getFrameHeight(), false);
 			app.start();
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -51,12 +50,4 @@ public class PongGame extends StateBasedGame {
         this.getState(TWOPLAYER).init(gc, this);
         this.getState(DIFFICULTYMENU).init(gc, this);
     }
-	
-	public static int getWidth() {
-		return width;
-	}
-	
-	public static int getHeight() {
-		return height;
-	}
 }

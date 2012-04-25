@@ -70,12 +70,17 @@ public class MainMenuState extends BasicGameState {
 			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
 
 		if(pvpButtonArea.isMouseOver()){
-			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
-				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t); 
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				Settings.setIsLeftHuman(true);
+				Settings.setIsRightHuman(true);
+				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+			}
 		}
 
 		if(pvpcButtonArea.isMouseOver()){ 
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+				Settings.setIsLeftHuman(true);
+				Settings.setIsRightHuman(false);
 				sbg.enterState(PongGame.DIFFICULTYMENU, t, t);
 			}
 		}

@@ -12,7 +12,7 @@ import org.newdawn.slick.SlickException;
  */
 public class Paddle {
 
-	private int yPosition, xPosition, frameHeight, goal = 100;
+	private int yPosition, xPosition, goal = 100;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
 	private final int angle = 30, paddleSpeed = 4;
@@ -26,17 +26,16 @@ public class Paddle {
 	 *            drawn
 	 * @throws SlickException 
 	 */
-	public Paddle(int frameHeight, int xPosition, boolean humanPlayer) throws SlickException {
-		this.frameHeight = frameHeight;
+	public Paddle(int xPosition, boolean humanPlayer) throws SlickException {
 		paddleImage = new Image("data/paddles/paddle.png");
-		yPosition = (frameHeight-paddleImage.getHeight())/2;
+		yPosition = (Settings.getFrameHeight()-paddleImage.getHeight())/2;
 		this.xPosition = xPosition;
 		isHuman = humanPlayer;
 		
 		if(!isHuman) {
 			Random rand = new Random();
 			int paddleHeight = paddleImage.getHeight();
-			goal = rand.nextInt(frameHeight-paddleHeight) + paddleHeight/2;
+			goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight) + paddleHeight/2;
 		}
 		
 	}
@@ -67,7 +66,7 @@ public class Paddle {
 	 *  Moves the paddle down
 	 */
 	public void paddleDown() {
-		if(yPosition >= frameHeight-paddleImage.getHeight())
+		if(yPosition >= Settings.getFrameHeight()-paddleImage.getHeight())
 			yPosition -= paddleSpeed; // stops paddle from exiting screen
 		yPosition += paddleSpeed;
 	}

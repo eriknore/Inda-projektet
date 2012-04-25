@@ -63,7 +63,7 @@ public class Ball {
 	 * @param bottomWall
 	 * @return
 	 */
-	public void moveBall(Paddle left, Paddle right, int frameHeight) {
+	public void moveBall(Paddle left, Paddle right) {
 		if(isServingLeft) {
 			xPosition = left.getX() + left.getImage().getWidth();
 			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
@@ -74,22 +74,22 @@ public class Ball {
 			yPosition = right.getY() +(right.getImage().getHeight()-diameter)/2;
 			return;
 		}
-		checkWalls(frameHeight);
+		checkWalls();
 		checkPaddles(left, right);
 		yPosition += deltaY;
 		xPosition += deltaX;
 		return;
 	}
 
-	private void checkWalls(int frameHeight) {
+	private void checkWalls() {
 		if(yPosition <= 0) {
 			yPosition = 1;
 			deltaY = -deltaY;
 			if(deltaY == 0)
 				deltaY = 1;
 		}
-		if(yPosition + diameter >= frameHeight) {
-			yPosition = frameHeight - diameter -1;
+		if(yPosition + diameter >= Settings.getFrameHeight()) {
+			yPosition = Settings.getFrameHeight() - diameter -1;
 			deltaY = -deltaY;
 			if(deltaY == 0)
 				deltaY = -1;
@@ -148,13 +148,15 @@ public class Ball {
 		return angle;
 	}
 
-	public boolean checkOutOfBounds(int frameWidth) {
-		if(xPosition - 50 > frameWidth) {
+	public boolean checkOutOfBounds() {
+		if(xPosition - 50 > Settings.getFrameWidth()) {
 			isServingRight = true;
+			deltaY = 0;
 			return true;
 		}
 		if(xPosition + 50 < 0) {
 			isServingLeft = true;
+			deltaY = 0;
 			return true;
 		}
 		return false;
@@ -176,9 +178,12 @@ public class Ball {
 		return deltaX;
 	}
 	
+	public double getBallSpeed() {
+		return ballSpeed;
+	}
+	
 	public void serve(int direction) {
 		deltaX = direction*ballSpeed;
-		deltaY = 0;
 		isServingLeft = false;
 		isServingRight = false;
 	}
