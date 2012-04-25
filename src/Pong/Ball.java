@@ -134,11 +134,11 @@ public class Ball {
 		// set a ratio between angle and paddle-size
 		double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
 		double angle;
-		if(yPosition+diameter < paddleY+halfPaddleHeight) { // above paddle-center
+		if(yPosition+diameter/2 < paddleY+halfPaddleHeight) { // above paddle-center
 			// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
 			// 1<= newYSpeed <= 60
 			angle = -Math.toRadians(returnAngle-(ballValue*angleHeightRatio)); // minus because up is -Y
-		} else if(yPosition > paddleY + halfPaddleHeight) { // below paddle-center
+		} else if(yPosition+diameter/2 > paddleY + halfPaddleHeight) { // below paddle-center
 			// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
 			// 1<= newYSpeed <= 60
 			angle = Math.toRadians((-returnAngle)+(ballValue*angleHeightRatio));
