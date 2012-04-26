@@ -34,7 +34,8 @@ public class GamePlayState extends BasicGameState {
 	private int leftScore = 0;
 	private int rightScore = 0;
 	
-	private int AIDelay = 0;
+	private int AIDelay = 0, range;
+	private Random rand = new Random();
 	
 	//temp
 	private double distanceToFirstBounce, yDistanceAfterOneBounce, yDistanceAfterAllBounces, numberOfBouncesEvenOrOdd, timeToImpact, yDistance, actualYDistance;
@@ -237,7 +238,6 @@ public class GamePlayState extends BasicGameState {
 		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
 		int currentGoal = paddle.getGoal();
 		if(centerOfPaddle + 2 >= currentGoal && centerOfPaddle - 2 <= currentGoal) { 
-			Random rand = new Random();
 			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
 			paddle.setGoal(goal+paddleHeight/2);
 			return;
@@ -252,21 +252,22 @@ public class GamePlayState extends BasicGameState {
 	private void getAIMedium(Paddle paddle) {
 		if(AIServe(paddle) && AIDelay < 200) {
 			int paddleHeight = paddle.getImage().getHeight();
-			Random rand = new Random();
 			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
 			paddle.setGoal(goal+paddleHeight/2);
 		}
 		
 		if(paddle.getX() < Settings.getFrameWidth()/2) {
-			if(ball.getDeltaX() > 0)
+			if(ball.getDeltaX() > 0) {
 				paddle.setGoal(Settings.getFrameHeight()/2);
-			else {
+				range = 2 + rand.nextInt(5);
+			} else {
 				paddle.setGoal(ball.getYPosition() - ball.getImage().getHeight()/2);
 			}
 		} else {
-			if(ball.getDeltaX() < 0)
+			if(ball.getDeltaX() < 0) {
 				paddle.setGoal(Settings.getFrameHeight()/2);
-			else {
+				range = 2 + rand.nextInt(8);
+			} else {
 				paddle.setGoal(ball.getYPosition() - ball.getImage().getHeight()/2);
 			}
 		}
@@ -274,7 +275,7 @@ public class GamePlayState extends BasicGameState {
 		int paddleHeight = paddle.getImage().getHeight();
 		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
 		int currentGoal = paddle.getGoal();
-		if(centerOfPaddle + 2 >= currentGoal && centerOfPaddle - 2 <= currentGoal) { 
+		if(centerOfPaddle + range >= currentGoal && centerOfPaddle - range <= currentGoal) { 
 			return;
 		}
 		if(centerOfPaddle > currentGoal) {
@@ -287,7 +288,6 @@ public class GamePlayState extends BasicGameState {
 	private void getAIHard(Paddle paddle) {
 		if(AIServe(paddle) && AIDelay < 200) {
 			int paddleHeight = paddle.getImage().getHeight();
-			Random rand = new Random();
 			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
 			paddle.setGoal(goal+paddleHeight/2);
 		}
