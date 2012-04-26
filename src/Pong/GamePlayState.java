@@ -3,8 +3,6 @@ package Pong;
 
 
 import java.util.Random;
-import java.util.concurrent.DelayQueue;
-
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -113,10 +111,22 @@ public class GamePlayState extends BasicGameState {
 		}
 		
 		if(!paddleRight.isHuman()) {
-			getAIHard(paddleRight);
+			if(Settings.getDifficulty().equals("Easy")) {
+				getAIEasy(paddleRight);
+			} if(Settings.getDifficulty().equals("Medium")) {
+				getAIMedium(paddleRight);
+			} else {
+				getAIHard(paddleRight);
+			}
 		}
 		if (!paddleLeft.isHuman()) {
-			getAIHard(paddleLeft);
+			if(Settings.getDifficulty().equals("Easy")) {
+				getAIEasy(paddleLeft);
+			} if(Settings.getDifficulty().equals("Medium")) {
+				getAIMedium(paddleLeft);
+			} else {
+				getAIHard(paddleLeft);
+			}
 		}
 		
 		ball.moveBall(paddleLeft, paddleRight);
@@ -226,10 +236,45 @@ public class GamePlayState extends BasicGameState {
 		int paddleHeight = paddle.getImage().getHeight();
 		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
 		int currentGoal = paddle.getGoal();
-		if(centerOfPaddle + 5 >= currentGoal && centerOfPaddle - 5 <= currentGoal) { 
+		if(centerOfPaddle + 2 >= currentGoal && centerOfPaddle - 2 <= currentGoal) { 
 			Random rand = new Random();
 			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
 			paddle.setGoal(goal+paddleHeight/2);
+			return;
+		}
+		if(centerOfPaddle > currentGoal) {
+			paddle.paddleUp();
+		} else if(centerOfPaddle < currentGoal) {
+			paddle.paddleDown();
+		}
+	}
+	
+	private void getAIMedium(Paddle paddle) {
+		if(AIServe(paddle) && AIDelay < 200) {
+			int paddleHeight = paddle.getImage().getHeight();
+			Random rand = new Random();
+			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
+			paddle.setGoal(goal+paddleHeight/2);
+		}
+		
+		if(paddle.getX() < Settings.getFrameWidth()/2) {
+			if(ball.getDeltaX() > 0)
+				paddle.setGoal(Settings.getFrameHeight()/2);
+			else {
+				paddle.setGoal(ball.getYPosition() - ball.getImage().getHeight()/2);
+			}
+		} else {
+			if(ball.getDeltaX() < 0)
+				paddle.setGoal(Settings.getFrameHeight()/2);
+			else {
+				paddle.setGoal(ball.getYPosition() - ball.getImage().getHeight()/2);
+			}
+		}
+		
+		int paddleHeight = paddle.getImage().getHeight();
+		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
+		int currentGoal = paddle.getGoal();
+		if(centerOfPaddle + 2 >= currentGoal && centerOfPaddle - 2 <= currentGoal) { 
 			return;
 		}
 		if(centerOfPaddle > currentGoal) {
