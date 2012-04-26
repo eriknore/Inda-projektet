@@ -127,6 +127,7 @@ public class GamePlayState extends BasicGameState {
 		updateInterval -= limit;
 	}
 
+
 	@Override
 	public void render(GameContainer container, StateBasedGame sbg, Graphics g)
 			throws SlickException {
