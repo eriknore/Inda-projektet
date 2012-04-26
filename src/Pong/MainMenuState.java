@@ -20,10 +20,10 @@ import org.newdawn.slick.state.transition.Transition;
 public class MainMenuState extends BasicGameState {
 
 	private int stateID = -1;
-	private Image menuBackground, pvpButton, pvpcButton, quitButton;
+	private Image menuBackground, pvpButton, pvpcButton, demoButton, quitButton;
 	private int firstMenuButtonX = 80; // [Player vs Player] button
 	private int firstMenuButtonY = 50;
-	private MouseOverArea pvpButtonArea, pvpcButtonArea, quitButtonArea; 
+	private MouseOverArea pvpButtonArea, pvpcButtonArea, demoButtonArea, quitButtonArea; 
 
 	public MainMenuState(int stateID) {
 		this.stateID = stateID; 
@@ -34,17 +34,20 @@ public class MainMenuState extends BasicGameState {
 		menuBackground = new Image("data/backgrounds/menu.png");
 		pvpButton = new Image("data/menu/playervsplayer.png"); 
 		pvpcButton = new Image("data/menu/playervsai.png");
+		demoButton = new Image("data/menu/demo.png");
 		quitButton = new Image("data/menu/quitgame.png");
 		pvpButtonArea = new MouseOverArea(gc, pvpButton, firstMenuButtonX, firstMenuButtonY);
 		pvpcButtonArea = new MouseOverArea(gc, pvpcButton, firstMenuButtonX, firstMenuButtonY + 80);
-		quitButtonArea = new MouseOverArea(gc, quitButton, firstMenuButtonX, firstMenuButtonY + 160);
+		demoButtonArea = new MouseOverArea(gc, demoButton, firstMenuButtonX, firstMenuButtonY + 160);
+		quitButtonArea = new MouseOverArea(gc, quitButton, firstMenuButtonX, firstMenuButtonY + 240);
 	}
 
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		menuBackground.draw(0, 0);
 		pvpButton.draw(firstMenuButtonX, firstMenuButtonY);
 		pvpcButton.draw(firstMenuButtonX, firstMenuButtonY + 80);
-		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
+		demoButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
+		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 240);
 		buttonVisualEffect();
 	}
 
@@ -53,8 +56,8 @@ public class MainMenuState extends BasicGameState {
 	 * the mouse is on the button.
 	 */
 	private void buttonVisualEffect(){
-		MouseOverArea[] areas = {pvpButtonArea, pvpcButtonArea, quitButtonArea}; 
-		Image[] images = {pvpButton, pvpcButton, quitButton};
+		MouseOverArea[] areas = {pvpButtonArea, pvpcButtonArea, demoButtonArea, quitButtonArea}; 
+		Image[] images = {pvpButton, pvpcButton, demoButton, quitButton};
 		for(int i = 0 ; i < areas.length ; i++){
 			if(areas[i].isMouseOver()){
 				images[i].draw(firstMenuButtonX, firstMenuButtonY + (i*80), 0.99f);
@@ -79,7 +82,7 @@ public class MainMenuState extends BasicGameState {
 
 		if(pvpcButtonArea.isMouseOver()){ 
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
-				Settings.setIsLeftHuman(false);
+				Settings.setIsLeftHuman(true);
 				Settings.setIsRightHuman(false);
 				sbg.enterState(PongGame.DIFFICULTYMENU, t, t);
 			}
@@ -89,6 +92,15 @@ public class MainMenuState extends BasicGameState {
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON))
 				gc.exit();
 		}
+
+		if(demoButtonArea.isMouseOver()){
+			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+				Settings.setIsLeftHuman(false);
+				Settings.setIsRightHuman(false);
+				sbg.enterState(PongGame.DIFFICULTYMENU,t ,t);
+			}
+		}
+
 	}
 
 	/**

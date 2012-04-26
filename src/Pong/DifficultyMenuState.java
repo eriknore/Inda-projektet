@@ -13,7 +13,7 @@ import org.newdawn.slick.state.transition.Transition;
 
 /**
  * A stateclass representing the difficulty menu.
- * Used when the user chooses to play vs PC.
+ * Used when the user chooses to play vs PC or Demo Mode.
  * @author Erik Norell & Daniel Aceituno
  * @version 2012-04-23
  */

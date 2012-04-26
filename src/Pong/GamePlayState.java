@@ -22,7 +22,7 @@ import org.newdawn.slick.state.transition.Transition;
  */
 public class GamePlayState extends BasicGameState {
 	
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private int stateID = -1;
 	private Image background;
@@ -71,8 +71,11 @@ public class GamePlayState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
-		if(!(paddleLeft.isHuman() == Settings.isLeftPaddleHuman()) || !(paddleRight.isHuman() == Settings.isRightPaddleHuman()))
+		if(!Settings.isGameRunning()){
+			leftScore = 0;
+			rightScore = 0;
 			init(container, sbg);
+		}
 		updateInterval += delta;
 		int limit = 20;
 		if(updateInterval < limit)
