@@ -1,7 +1,5 @@
 package Pong;
 
-import java.util.Random;
-
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
@@ -12,10 +10,10 @@ import org.newdawn.slick.SlickException;
  */
 public class Paddle {
 
-	private int yPosition, xPosition, goal = 100;
+	private int yPosition, xPosition, goal = 0, paddleSpeed = 4;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
-	private final int angle = 30, paddleSpeed = 4;
+	private final int angle = 30;
 	private boolean isHuman;
 
 	/**
@@ -33,9 +31,9 @@ public class Paddle {
 		isHuman = humanPlayer;
 		
 		if(!isHuman) {
-			Random rand = new Random();
-			int paddleHeight = paddleImage.getHeight();
-			goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight) + paddleHeight/2;
+			goal = Settings.getFrameHeight()/2;
+			if(Settings.getDifficulty().equals("Easy"))
+				paddleSpeed = 2;
 		}
 		
 	}
