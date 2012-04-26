@@ -26,7 +26,7 @@ public class PongGame extends StateBasedGame {
 	public static void main(String[] args) {
 		try {
 			AppGameContainer app = new AppGameContainer(new PongGame());
-			app.setDisplayMode(Settings.getFrameWidth(), Settings.getFrameHeight(), false);
+			app.setDisplayMode(Settings.getFrameWidth(), Settings.getFrameHeight(), true);
 			app.start();
 		} catch (SlickException e) {
 			e.printStackTrace();
