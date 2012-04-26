@@ -49,6 +49,8 @@ public class MainMenuState extends BasicGameState {
 		demoButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
 		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 240);
 		buttonVisualEffect();
+		
+	
 	}
 
 	/**
@@ -74,6 +76,7 @@ public class MainMenuState extends BasicGameState {
 
 		if(pvpButtonArea.isMouseOver()){
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				Settings.setGameIsRunning(false);
 				Settings.setIsLeftHuman(true);
 				Settings.setIsRightHuman(true);
 				sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
@@ -82,6 +85,7 @@ public class MainMenuState extends BasicGameState {
 
 		if(pvpcButtonArea.isMouseOver()){ 
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+				Settings.setGameIsRunning(false);
 				Settings.setIsLeftHuman(true);
 				Settings.setIsRightHuman(false);
 				sbg.enterState(PongGame.DIFFICULTYMENU, t, t);
@@ -95,12 +99,12 @@ public class MainMenuState extends BasicGameState {
 
 		if(demoButtonArea.isMouseOver()){
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
+				Settings.setGameIsRunning(false);
 				Settings.setIsLeftHuman(false);
 				Settings.setIsRightHuman(false);
 				sbg.enterState(PongGame.DIFFICULTYMENU,t ,t);
 			}
 		}
-
 	}
 
 	/**

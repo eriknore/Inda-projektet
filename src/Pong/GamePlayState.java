@@ -65,7 +65,6 @@ public class GamePlayState extends BasicGameState {
 		paddleRight = new Paddle(paddleRightXPosition, Settings.isRightPaddleHuman());
 		// mirror the startposition of paddle1
 		ball = new Ball();
-		Settings.setGameIsRunning(true);
 	}
 
 	@Override
@@ -75,6 +74,7 @@ public class GamePlayState extends BasicGameState {
 			leftScore = 0;
 			rightScore = 0;
 			init(container, sbg);
+			Settings.setGameIsRunning(true);
 		}
 		updateInterval += delta;
 		int limit = 20;
