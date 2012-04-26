@@ -85,14 +85,10 @@ public class Ball {
 		if(yPosition <= 0) {
 			yPosition = 1;
 			deltaY = -deltaY;
-			if(deltaY == 0)
-				deltaY = 1;
 		}
 		if(yPosition + diameter >= Settings.getFrameHeight()) {
 			yPosition = Settings.getFrameHeight() - diameter -1;
 			deltaY = -deltaY;
-			if(deltaY == 0)
-				deltaY = -1;
 		}
 	}
 
