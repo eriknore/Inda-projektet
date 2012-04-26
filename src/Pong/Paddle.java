@@ -102,8 +102,4 @@ public class Paddle {
 			ball.serve(-1);
 		}
 	}
-	
-	public int getPaddleSpeed() {
-		return paddleSpeed;
-	}
 }

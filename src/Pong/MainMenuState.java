@@ -62,7 +62,7 @@ public class MainMenuState extends BasicGameState {
 		Image[] images = {pvpButton, pvpcButton, demoButton, quitButton};
 		for(int i = 0 ; i < areas.length ; i++){
 			if(areas[i].isMouseOver()){
-				images[i].draw(firstMenuButtonX, firstMenuButtonY + (i*80), 0.99f);
+				images[i].draw(firstMenuButtonX*0.97f, firstMenuButtonY*0.98f + (i*80), 1.04f);
 			}
 		}
 	}

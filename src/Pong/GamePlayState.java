@@ -20,7 +20,7 @@ import org.newdawn.slick.state.transition.Transition;
  */
 public class GamePlayState extends BasicGameState {
 	
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 
 	private int stateID = -1;
 	private Image background;

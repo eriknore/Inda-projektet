@@ -102,12 +102,12 @@ public class DifficultyMenuState extends BasicGameState {
 		Image[] images = {easy, medium, hard};
 		for(int i = 0 ; i < areas.length ; i++){
 			if(areas[i].isMouseOver()){
-				images[i].draw(firstMenuButtonX + (i*110), firstMenuButtonY, 0.99f);
+				images[i].draw(firstMenuButtonX*0.99f + (i*110), firstMenuButtonY*0.99f, 1.04f);
 			}
 		}
 		// And the cancelbutton has special coordinates
 		if(cancelArea.isMouseOver())
-			cancel.draw(firstMenuButtonX + 95, firstMenuButtonY + 110, 0.99f);
+			cancel.draw((firstMenuButtonX + 95)*0.99f, (firstMenuButtonY + 110)*0.99f, 1.04f);
 	}
 
 
