@@ -20,7 +20,7 @@ import org.newdawn.slick.state.transition.Transition;
 public class HelpState extends BasicGameState {
 
 	private int stateID = -1;
-	private Image helpmenubackground;
+	private Image helpmenubackground, largeBallEffect, smallBallEffect, largePaddleEffect, smallPaddleEffect;
     private static int width = 800, height = 600; // resolution
 	
 	public HelpState(int stateID) {
@@ -31,7 +31,10 @@ public class HelpState extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		helpmenubackground = new Image("data/backgrounds/helpmenubackground.png");
-
+		largeBallEffect = new Image("data/effects/largerballeffect.png");
+		smallBallEffect = new Image("data/effects/smallerballeffect.png");
+		smallPaddleEffect = new Image("data/effects/smallerpaddleeffect.png");
+		largePaddleEffect = new Image("data/effects/largerpaddleeffect.png");
 	}
 
 	@Override
@@ -41,6 +44,19 @@ public class HelpState extends BasicGameState {
 		int rightLineX = 540;
 		int leftLineX = 50;
 		int y = 50;
+		
+		largeBallEffect.draw(leftLineX, y+300);
+		g.drawString(" - Happy effect", leftLineX+ 30, y+300);
+		
+		smallBallEffect.draw(leftLineX, y + 340);
+		g.drawString(" - Sad effect", leftLineX + 30, y + 340);
+		
+		largePaddleEffect.draw(leftLineX, y + 400);
+		g.drawString(" - Happy paddle!", leftLineX + 30 , y+ 400);
+		
+		smallPaddleEffect.draw(leftLineX+200, y + 400);
+		g.drawString("- Sad Paddle!", leftLineX + 230, y + 400);
+		
 		
 		g.drawString("Right Player controls: ", rightLineX, y);
 		g.drawString("Move up: Up Arrow", rightLineX, y+50);
