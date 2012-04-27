@@ -86,8 +86,8 @@ public class MainMenuState extends BasicGameState {
 		if(pvpcButtonArea.isMouseOver()){ 
 			if(input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)){
 				Settings.setGameIsRunning(false);
-				Settings.setIsLeftHuman(true);
-				Settings.setIsRightHuman(false);
+				Settings.setIsLeftHuman(false);
+				Settings.setIsRightHuman(true);
 				sbg.enterState(PongGame.DIFFICULTYMENU, t, t);
 			}
 		}

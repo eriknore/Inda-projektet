@@ -31,8 +31,8 @@ public class GamePlayState extends BasicGameState {
 	private Ball ball;
 	private int updateInterval = 0;
 
-	private int leftScore = 0;
-	private int rightScore = 0;
+	private int leftScore = 0, rightScore = 0;
+	private String playerLeft, playerRight;
 	
 	private int AIDelay = 0, range = 2;
 	private Random rand = new Random();
@@ -64,6 +64,16 @@ public class GamePlayState extends BasicGameState {
 		paddleRight = new Paddle(paddleRightXPosition, Settings.isRightPaddleHuman());
 		// mirror the startposition of paddle1
 		ball = new Ball();
+		if(paddleRight.isHuman()) {
+			playerRight = "Player 1";
+		} else {
+			playerRight = "PC";
+		}
+		if(paddleLeft.isHuman()) {
+			playerLeft = "Player 2";
+		} else {
+			playerLeft = "PC";
+		}
 	}
 
 	@Override
@@ -147,9 +157,12 @@ public class GamePlayState extends BasicGameState {
 		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
 		ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
 
-		g.drawString("" + rightScore, 500, 40);
-		g.drawString("" + leftScore, 300, 40);
+//		g.drawString("" + rightScore, 500, 40);
+//		g.drawString("" + leftScore, 300, 40);
 		g.drawString("Press 'H' for help", Settings.getFrameWidth()-200, Settings.getFrameHeight()-30);
+		
+		g.drawString(playerLeft + ":    " + leftScore, 200, 40);
+		g.drawString(playerRight + ":    " + rightScore, 500, 40);
 		
 		if(DEBUG) {
 			double deltaX = ball.getDeltaX();

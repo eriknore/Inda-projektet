@@ -45,31 +45,31 @@ public class HelpState extends BasicGameState {
 		int leftLineX = 50;
 		int y = 50;
 		
-		largeBallEffect.draw(leftLineX, y+300);
-		g.drawString(" - Happy effect", leftLineX+ 30, y+300);
-		
-		smallBallEffect.draw(leftLineX, y + 340);
-		g.drawString(" - Sad effect", leftLineX + 30, y + 340);
-		
-		largePaddleEffect.draw(leftLineX, y + 400);
-		g.drawString(" - Happy paddle!", leftLineX + 30 , y+ 400);
-		
-		smallPaddleEffect.draw(leftLineX+200, y + 400);
-		g.drawString("- Sad Paddle!", leftLineX + 230, y + 400);
+//		largeBallEffect.draw(leftLineX, y+300);
+//		g.drawString(" - Happy effect", leftLineX+ 30, y+300);
+//		
+//		smallBallEffect.draw(leftLineX, y + 340);
+//		g.drawString(" - Sad effect", leftLineX + 30, y + 340);
+//		
+//		largePaddleEffect.draw(leftLineX, y + 400);
+//		g.drawString(" - Happy paddle!", leftLineX + 30 , y+ 400);
+//		
+//		smallPaddleEffect.draw(leftLineX+200, y + 400);
+//		g.drawString("- Sad Paddle!", leftLineX + 230, y + 400);
 		
 		
 		g.drawString("Right Player controls: ", rightLineX, y);
 		g.drawString("Move up: Up Arrow", rightLineX, y+50);
 		g.drawString("Move down: Down Arrow", rightLineX, y+100);
 		g.drawString("Serve: Left Arrow", rightLineX, y+150);
-		g.drawString("Use Weapon: Left Arrow", rightLineX, y+200);
+//		g.drawString("Use Weapon: Left Arrow", rightLineX, y+200);
 		g.drawString("Left Player controls: ", leftLineX, y);
 		g.drawString("Move up: W", leftLineX, y+50);
 		g.drawString("Move down: S", leftLineX, y+100);
 		g.drawString("Serve: D", leftLineX, y+150);
-		g.drawString("Use Weapon: D", leftLineX, y+200);
+//		g.drawString("Use Weapon: D", leftLineX, y+200);
 		
-		g.drawString("Press 'H' to return", width-200, height-30); 
+		g.drawString("Press 'H' to return, 'Esc' to return to main menu", 300, height-30); 
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class HelpState extends BasicGameState {
 		Transition t = new FadeOutTransition();
 		
 		if(input.isKeyDown(Input.KEY_ESCAPE)) 
-			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
+			sbg.enterState(PongGame.MAINMENUSTATE, t, t);
 
 		if(input.isKeyDown(Input.KEY_H)) 
 			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
