@@ -2,12 +2,16 @@ package Pong;
 
 
 
+
 import java.util.Random;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeOutTransition;
@@ -19,7 +23,7 @@ import org.newdawn.slick.state.transition.Transition;
  * @version 2012-04-16
  */
 public class GamePlayState extends BasicGameState {
-	
+
 	private static final boolean DEBUG = false;
 
 	private int stateID = -1;
@@ -33,15 +37,15 @@ public class GamePlayState extends BasicGameState {
 
 	private int leftScore = 0, rightScore = 0;
 	private String playerLeft, playerRight;
-	
+
 	private int AIDelay = 0, range = 2;
 	private Random rand = new Random();
-	
+
 	//temp
 	private double distanceToFirstBounce, yDistanceAfterOneBounce, yDistanceAfterAllBounces, numberOfBouncesEvenOrOdd, timeToImpact, yDistance, actualYDistance;
 	private int distanceToOtherPaddle, numberOfBounces, goal;
 
-	
+
 	public GamePlayState(int stateID) {
 		this.stateID = stateID;
 	}
@@ -74,6 +78,11 @@ public class GamePlayState extends BasicGameState {
 		} else {
 			playerLeft = "PC";
 		}
+		
+		
+		////////////////////effects
+		effect = new Effect();
+		///////////////////////
 	}
 
 	@Override
@@ -89,9 +98,9 @@ public class GamePlayState extends BasicGameState {
 		int limit = 20;
 		if(updateInterval < limit)
 			return;
-		
+
 		Transition t = new FadeOutTransition();
-		
+
 		Input input = container.getInput();
 
 		if(input.isKeyDown(Input.KEY_ESCAPE)) 
@@ -102,7 +111,7 @@ public class GamePlayState extends BasicGameState {
 
 		if(paddleLeft.isHuman()) {
 			if(input.isKeyDown(Input.KEY_W))
-			paddleLeft.paddleUp();
+				paddleLeft.paddleUp();
 
 			if(input.isKeyDown(Input.KEY_S))
 				paddleLeft.paddleDown();
@@ -120,7 +129,7 @@ public class GamePlayState extends BasicGameState {
 			if(input.isKeyDown(Input.KEY_LEFT) && ball.isServingRight())
 				paddleRight.serve(ball);
 		}
-		
+
 		if(!paddleRight.isHuman()) {
 			if(Settings.getDifficulty().equals("Easy")) {
 				getAIEasy(paddleRight);
@@ -139,13 +148,19 @@ public class GamePlayState extends BasicGameState {
 				getAIHard(paddleLeft);
 			}
 		}
-		
+
 		ball.moveBall(paddleLeft, paddleRight);
-		
+
 		if(ball.checkOutOfBounds())
 			playerScore();
-		
+
 		updateInterval -= limit;
+		
+		
+		//effects
+		checkEffectCollision();
+		//effects
+		
 	}
 
 
@@ -153,41 +168,48 @@ public class GamePlayState extends BasicGameState {
 	public void render(GameContainer container, StateBasedGame sbg, Graphics g)
 			throws SlickException {
 		background.draw(0, 0);
+		
+		//effects
+		if(oncePerRound == 0){
+		setRandomEffect();
+		}
+		//effects
+		
 		paddleLeft.getImage().draw(paddleLeftXPosition, paddleLeft.getY());
 		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
 		ball.getImage().draw(ball.getXPosition(), ball.getYPosition());
 
-//		g.drawString("" + rightScore, 500, 40);
-//		g.drawString("" + leftScore, 300, 40);
+		//		g.drawString("" + rightScore, 500, 40);
+		//		g.drawString("" + leftScore, 300, 40);
 		g.drawString("Press 'H' for help", Settings.getFrameWidth()-200, Settings.getFrameHeight()-30);
-		
+
 		g.drawString(playerLeft + ":    " + leftScore, 200, 40);
 		g.drawString(playerRight + ":    " + rightScore, 500, 40);
-		
+
 		if(DEBUG) {
 			double deltaX = ball.getDeltaX();
 			double deltaY = ball.getDeltaY();
 			int width = Settings.getFrameWidth();
 			g.drawString("Delta X =" + deltaX, 100, 100);
 			g.drawString("Delta Y=" + deltaY, 500, 100);
-//			g.drawString("Vector value: " + Math.hypot(deltaX, deltaY), 220, 120);
+			//			g.drawString("Vector value: " + Math.hypot(deltaX, deltaY), 220, 120);
 			g.drawString("UpsateInterval: " + updateInterval, 500, 120);
-//			g.drawString("X:" + paddleLeft.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 100, 100);
-//			g.drawString("X:" + paddleLeft.getX() + " > " + width/2 + " && " + ball.isServingRight(), 100, 120);
-//			g.drawString("X:" + paddleRight.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 500, 100);
-//			g.drawString("X:" + paddleRight.getX() + " > " + width/2 + " && " + ball.isServingRight(), 500, 120);
+			//			g.drawString("X:" + paddleLeft.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 100, 100);
+			//			g.drawString("X:" + paddleLeft.getX() + " > " + width/2 + " && " + ball.isServingRight(), 100, 120);
+			//			g.drawString("X:" + paddleRight.getX() + " < " + width/2 + " && " + ball.isServingLeft(), 500, 100);
+			//			g.drawString("X:" + paddleRight.getX() + " > " + width/2 + " && " + ball.isServingRight(), 500, 120);
 			g.drawString("Left goal: " + paddleLeft.getGoal(), 100, 440);
 			g.drawString("Right goal: " + paddleRight.getGoal(), 500, 440);
-//			
-//			int paddleHeight = paddleLeft.getImage().getHeight();
-//			int centerOfPaddle = paddleLeft.getY() + paddleHeight/2 + paddleLeft.getImage().getWidth()/2;
-//			g.drawString("" + centerOfPaddle, 250, 140);
-//			paddleHeight = paddleRight.getImage().getHeight();
-//			centerOfPaddle = paddleRight.getY() + paddleHeight/2 + paddleRight.getImage().getWidth()/2;
-//			g.drawString("" + centerOfPaddle, 650, 140);
-			
+			//			
+			//			int paddleHeight = paddleLeft.getImage().getHeight();
+			//			int centerOfPaddle = paddleLeft.getY() + paddleHeight/2 + paddleLeft.getImage().getWidth()/2;
+			//			g.drawString("" + centerOfPaddle, 250, 140);
+			//			paddleHeight = paddleRight.getImage().getHeight();
+			//			centerOfPaddle = paddleRight.getY() + paddleHeight/2 + paddleRight.getImage().getWidth()/2;
+			//			g.drawString("" + centerOfPaddle, 650, 140);
+
 			int distance = 115;
-			
+
 			g.drawString("Paddle-center: " + (paddleRight.getY() + paddleRight.getImage().getHeight()/2), 500, distance);
 			distance += 15;
 			g.drawString("Ball-center Y-coordinate: " + ball.getYPosition(), 500, distance);
@@ -196,41 +218,41 @@ public class GamePlayState extends BasicGameState {
 				g.drawString("Goal: " + goal, 100, distance);
 				return;
 			}
-			
+
 			distance += 30;
-//			g.drawString("distanceToOtherPaddle: " + distanceToOtherPaddle, 100, distance);
-//			distance += 15;
-//			g.drawString("timeToImpact: " + timeToImpact, 100, distance);
-//			distance += 15;
+			//			g.drawString("distanceToOtherPaddle: " + distanceToOtherPaddle, 100, distance);
+			//			distance += 15;
+			//			g.drawString("timeToImpact: " + timeToImpact, 100, distance);
+			//			distance += 15;
 			g.drawString("yDistance: " + yDistance, 100, distance);
 			distance += 15;
 			g.drawString("actualYDistance: " + actualYDistance, 500, distance);
-//			g.drawString("distanceToFirstBounce :" + distanceToFirstBounce, 100, distance);
-//			distance += 15;
-//			
-//
-//			
-//			
-//			g.drawString("yDistanceAfterOneBounce: " + yDistanceAfterOneBounce, 100, distance);
-//			distance += 15;
-//			g.drawString("numberOfBounces: " + numberOfBounces, 100, distance);
-//			distance += 15;
-//			g.drawString("yDistanceAfterAllBounces: " + yDistanceAfterAllBounces, 100, distance);
-//			distance += 15;
-//			g.drawString("numberOfBouncesEvenOrOdd: " + numberOfBouncesEvenOrOdd, 100, distance);
-//			distance += 15;
-//			g.drawString("Goal: " + goal, 100, distance);
-//			distance += 15;
-//			g.drawString("Goal-int: " + goal, 100, distance);
-//
-//			g.drawString("Goal: " + goal, 100, 115);
-//			g.drawString("Ball-goal: " + paddleRight.getGoal(), 100, 130);
-			
+			//			g.drawString("distanceToFirstBounce :" + distanceToFirstBounce, 100, distance);
+			//			distance += 15;
+			//			
+			//
+			//			
+			//			
+			//			g.drawString("yDistanceAfterOneBounce: " + yDistanceAfterOneBounce, 100, distance);
+			//			distance += 15;
+			//			g.drawString("numberOfBounces: " + numberOfBounces, 100, distance);
+			//			distance += 15;
+			//			g.drawString("yDistanceAfterAllBounces: " + yDistanceAfterAllBounces, 100, distance);
+			//			distance += 15;
+			//			g.drawString("numberOfBouncesEvenOrOdd: " + numberOfBouncesEvenOrOdd, 100, distance);
+			//			distance += 15;
+			//			g.drawString("Goal: " + goal, 100, distance);
+			//			distance += 15;
+			//			g.drawString("Goal-int: " + goal, 100, distance);
+			//
+			//			g.drawString("Goal: " + goal, 100, 115);
+			//			g.drawString("Ball-goal: " + paddleRight.getGoal(), 100, 130);
+
 		}
-		
+
 
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -243,10 +265,10 @@ public class GamePlayState extends BasicGameState {
 			actualYDistance = 0;
 		}
 	}
-	
+
 	private void getAIEasy(Paddle paddle) {
 		AIServe(paddle);
-		
+
 		int paddleHeight = paddle.getImage().getHeight();
 		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
 		int currentGoal = paddle.getGoal();
@@ -261,14 +283,14 @@ public class GamePlayState extends BasicGameState {
 			paddle.paddleDown();
 		}
 	}
-	
+
 	private void getAIMedium(Paddle paddle) {
 		if(AIServe(paddle) && AIDelay < 200) {
 			int paddleHeight = paddle.getImage().getHeight();
 			int goal = rand.nextInt(Settings.getFrameHeight()-paddleHeight);
 			paddle.setGoal(goal+paddleHeight/2);
 		}
-		
+
 		if(paddle.getX() < Settings.getFrameWidth()/2) {
 			if(ball.getDeltaX() > 0) {
 				paddle.setGoal(Settings.getFrameHeight()/2);
@@ -284,7 +306,7 @@ public class GamePlayState extends BasicGameState {
 				paddle.setGoal(ball.getYPosition() - ball.getImage().getHeight()/2);
 			}
 		}
-		
+
 		int paddleHeight = paddle.getImage().getHeight();
 		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
 		int currentGoal = paddle.getGoal();
@@ -297,7 +319,7 @@ public class GamePlayState extends BasicGameState {
 			paddle.paddleDown();
 		}
 	}
-	
+
 	private void getAIHard(Paddle paddle) {
 		if(AIServe(paddle) && AIDelay < 200) {
 			int paddleHeight = paddle.getImage().getHeight();
@@ -308,17 +330,17 @@ public class GamePlayState extends BasicGameState {
 		if(paddle.getX() > Settings.getFrameWidth()/2 && ball.getDeltaX() > 0 && ball.getXPosition() >= paddleLeft.getX() + paddleLeft.getImage().getWidth() && ball.getXPosition() < paddleLeft.getX() + paddleLeft.getImage().getWidth() + 10) {
 			paddle.setGoal(calculateGoalRight(paddle));
 		} else if(paddle.getX() < Settings.getFrameWidth()/2) {
-				if(ball.getDeltaX() < 0) {
-					if(ball.getXPosition() + ball.getImage().getWidth() <= paddleRight.getX()) {
-						if(ball.getXPosition() + ball.getImage().getWidth() > paddleRight.getX() - 10) {
-							paddle.setGoal(calculateGoal(paddle));
-						}
+			if(ball.getDeltaX() < 0) {
+				if(ball.getXPosition() + ball.getImage().getWidth() <= paddleRight.getX()) {
+					if(ball.getXPosition() + ball.getImage().getWidth() > paddleRight.getX() - 10) {
+						paddle.setGoal(calculateGoal(paddle));
 					}
+				}
 
 			}
 		}
 
-		
+
 		if(ball.getDeltaX() > 0 && ball.getXPosition() + ball.getImage().getWidth() < paddleRight.getX()) {
 			if(Math.abs(ball.getDeltaY()) > 1) {
 				actualYDistance += (int) Math.abs(ball.getDeltaY());
@@ -326,11 +348,11 @@ public class GamePlayState extends BasicGameState {
 				actualYDistance += Math.abs(ball.getDeltaY());
 			}
 		}
-		
-//		if(ball.getDeltaX() > 0 && ball.getXPosition() + ball.getImage().getWidth() < paddleRight.getX()) {
-//			actualYDistance += Math.abs(ball.getDeltaY());
-//		}
-		
+
+		//		if(ball.getDeltaX() > 0 && ball.getXPosition() + ball.getImage().getWidth() < paddleRight.getX()) {
+		//			actualYDistance += Math.abs(ball.getDeltaY());
+		//		}
+
 
 		if(paddle.getX() > Settings.getFrameWidth()/2 && ball.getDeltaX() < 0) {
 			paddle.setGoal(Settings.getFrameHeight()/2);
@@ -347,7 +369,7 @@ public class GamePlayState extends BasicGameState {
 			paddle.paddleDown();
 		}
 	}
-	
+
 	private boolean AIServe(Paddle paddle) {
 		int paddleX = paddle.getX();
 		int width = Settings.getFrameWidth();
@@ -362,11 +384,11 @@ public class GamePlayState extends BasicGameState {
 		}
 		return false;
 	}
-	
+
 	private int calculateGoal(Paddle paddle) {
 		if(ball.getDeltaY() == 0)
 			return ball.getYPosition() + ball.getImage().getHeight();
-		
+
 		if(Math.abs(ball.getDeltaY()) > 0) {	
 			distanceToOtherPaddle = paddleRight.getX() - (paddleLeft.getX()+ paddleRight.getImage().getWidth() + ball.getImage().getWidth());
 			timeToImpact = distanceToOtherPaddle / (int) ball.getDeltaX();
@@ -376,66 +398,66 @@ public class GamePlayState extends BasicGameState {
 			timeToImpact = (distanceToOtherPaddle / ball.getDeltaX());
 			yDistance = (Math.abs(timeToImpact * ball.getDeltaY()));
 		}
-			yDistanceAfterAllBounces = yDistance;
-			distanceToFirstBounce = 0;
-			boolean willBounce = false;
-			numberOfBounces = 2;
-			if(ball.getDeltaY() < 0) {
-				if(yDistance > ball.getYPosition()) {	
-					distanceToFirstBounce = ball.getYPosition();
-					willBounce = true;
-				}
-			} else {
-				if(yDistance > Settings.getFrameHeight() - (ball.getYPosition() )) { // + ball.getImage().getHeight())) {	
-					distanceToFirstBounce = Math.abs(Settings.getFrameHeight() - (ball.getYPosition() )); //+ ball.getImage().getHeight()));
-					willBounce = true;
-				}
+		yDistanceAfterAllBounces = yDistance;
+		distanceToFirstBounce = 0;
+		boolean willBounce = false;
+		numberOfBounces = 2;
+		if(ball.getDeltaY() < 0) {
+			if(yDistance > ball.getYPosition()) {	
+				distanceToFirstBounce = ball.getYPosition();
+				willBounce = true;
 			}
-			if(willBounce) {
-				yDistanceAfterOneBounce = Math.abs(yDistance - distanceToFirstBounce);
-				numberOfBounces = 1;
-				yDistanceAfterAllBounces = yDistanceAfterOneBounce;
-				while((int) yDistanceAfterAllBounces > Settings.getFrameHeight() - ball.getImage().getHeight()) {
-					yDistanceAfterAllBounces = yDistanceAfterOneBounce - (Settings.getFrameHeight() - ball.getImage().getHeight());
-					numberOfBounces++;
-				}
-				numberOfBouncesEvenOrOdd = numberOfBounces % 2; // odd or even
-			} else {
-				if(ball.getDeltaY() < 0) {
-					// ingen studs - på väg åt uppåt
-					goal = (int) ball.getYPosition() - (int) yDistanceAfterAllBounces + ball.getImage().getHeight()/2 - paddle.getImage().getHeight()/2;
-					return goal;
-				} else {
-					// ingen studs - på väg åt nedåt
-					goal = (int) (ball.getYPosition() + (int) yDistanceAfterAllBounces) + ball.getImage().getHeight()/2 - paddle.getImage().getHeight()/2;
-					return goal;
-				}
+		} else {
+			if(yDistance > Settings.getFrameHeight() - (ball.getYPosition() )) { // + ball.getImage().getHeight())) {	
+				distanceToFirstBounce = Math.abs(Settings.getFrameHeight() - (ball.getYPosition() )); //+ ball.getImage().getHeight()));
+				willBounce = true;
 			}
-
-			if(ball.getDeltaY() < 0) {
-				if(numberOfBouncesEvenOrOdd == 1) {
-					// en studs - på väg ner
-					goal = (int) yDistanceAfterAllBounces - ball.getImage().getHeight()/2;
-				} else {
-					// två studs - på väg upp
-					goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces + paddle.getImage().getHeight();
-				}
-			} else {
-				if(numberOfBouncesEvenOrOdd == 0) {
-					// två studs - på väg ner
-					goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight()/2;// - paddle.getImage().getHeight()/2;
-				} else {
-					// en studs - på väg upp
-					goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces + ball.getImage().getHeight()/2;
-				}
-			}
-			return goal;
 		}
-	
+		if(willBounce) {
+			yDistanceAfterOneBounce = Math.abs(yDistance - distanceToFirstBounce);
+			numberOfBounces = 1;
+			yDistanceAfterAllBounces = yDistanceAfterOneBounce;
+			while((int) yDistanceAfterAllBounces > Settings.getFrameHeight() - ball.getImage().getHeight()) {
+				yDistanceAfterAllBounces = yDistanceAfterOneBounce - (Settings.getFrameHeight() - ball.getImage().getHeight());
+				numberOfBounces++;
+			}
+			numberOfBouncesEvenOrOdd = numberOfBounces % 2; // odd or even
+		} else {
+			if(ball.getDeltaY() < 0) {
+				// ingen studs - på väg åt uppåt
+				goal = (int) ball.getYPosition() - (int) yDistanceAfterAllBounces + ball.getImage().getHeight()/2 - paddle.getImage().getHeight()/2;
+				return goal;
+			} else {
+				// ingen studs - på väg åt nedåt
+				goal = (int) (ball.getYPosition() + (int) yDistanceAfterAllBounces) + ball.getImage().getHeight()/2 - paddle.getImage().getHeight()/2;
+				return goal;
+			}
+		}
+
+		if(ball.getDeltaY() < 0) {
+			if(numberOfBouncesEvenOrOdd == 1) {
+				// en studs - på väg ner
+				goal = (int) yDistanceAfterAllBounces - ball.getImage().getHeight()/2;
+			} else {
+				// två studs - på väg upp
+				goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces + paddle.getImage().getHeight();
+			}
+		} else {
+			if(numberOfBouncesEvenOrOdd == 0) {
+				// två studs - på väg ner
+				goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight()/2;// - paddle.getImage().getHeight()/2;
+			} else {
+				// en studs - på väg upp
+				goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces + ball.getImage().getHeight()/2;
+			}
+		}
+		return goal;
+	}
+
 	private int calculateGoalRight(Paddle paddle) {
 		if(ball.getDeltaY() == 0)
 			return ball.getYPosition() + ball.getImage().getHeight();
-		
+
 		if(Math.abs(ball.getDeltaY()) > 0) {	
 			distanceToOtherPaddle = paddleRight.getX() - (paddleLeft.getX()+ paddleRight.getImage().getWidth() + ball.getImage().getWidth());
 			timeToImpact = distanceToOtherPaddle / (int) ball.getDeltaX();
@@ -445,57 +467,118 @@ public class GamePlayState extends BasicGameState {
 			timeToImpact = (distanceToOtherPaddle / ball.getDeltaX());
 			yDistance = (Math.abs(timeToImpact * ball.getDeltaY()));
 		}
-			yDistanceAfterAllBounces = yDistance;
-			distanceToFirstBounce = 0;
-			boolean willBounce = false;
-			numberOfBounces = 2;
-			if(ball.getDeltaY() < 0) {
-				if(yDistance > ball.getYPosition()) {	
-					distanceToFirstBounce = ball.getYPosition();
-					willBounce = true;
-				}
-			} else {
-				if(yDistance > Settings.getFrameHeight() - (ball.getYPosition() )) { // + ball.getImage().getHeight())) {	
-					distanceToFirstBounce = Math.abs(Settings.getFrameHeight() - (ball.getYPosition() )); //+ ball.getImage().getHeight()));
-					willBounce = true;
-				}
+		yDistanceAfterAllBounces = yDistance;
+		distanceToFirstBounce = 0;
+		boolean willBounce = false;
+		numberOfBounces = 2;
+		if(ball.getDeltaY() < 0) {
+			if(yDistance > ball.getYPosition()) {	
+				distanceToFirstBounce = ball.getYPosition();
+				willBounce = true;
 			}
-			if(willBounce) {
-				yDistanceAfterOneBounce = Math.abs(yDistance - distanceToFirstBounce);
-				numberOfBounces = 1;
-				yDistanceAfterAllBounces = yDistanceAfterOneBounce;
-				while((int) yDistanceAfterAllBounces > Settings.getFrameHeight() - ball.getImage().getHeight()) {
-					yDistanceAfterAllBounces = yDistanceAfterOneBounce - (Settings.getFrameHeight() - ball.getImage().getHeight());
-					numberOfBounces++;
-				}
-				numberOfBouncesEvenOrOdd = numberOfBounces % 2; // odd or even
-			} else {
-				if(ball.getDeltaY() < 0) {
-					goal = (int) ((ball.getYPosition() - ball.getImage().getHeight()/2) - (int) yDistanceAfterAllBounces) - paddle.getImage().getHeight()/2;
-					return goal;
-				} else {
-					goal = (int) ((ball.getYPosition() - ball.getImage().getHeight()/2) + (int) yDistanceAfterAllBounces) + paddle.getImage().getHeight()/2;
-					return goal;
-				}
+		} else {
+			if(yDistance > Settings.getFrameHeight() - (ball.getYPosition() )) { // + ball.getImage().getHeight())) {	
+				distanceToFirstBounce = Math.abs(Settings.getFrameHeight() - (ball.getYPosition() )); //+ ball.getImage().getHeight()));
+				willBounce = true;
 			}
-
-			if(ball.getDeltaY() < 0) {
-				if(numberOfBouncesEvenOrOdd == 1) {
-					// en studs - på väg ner
-					goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight()/2;
-				} else {
-					// två - på väg upp
-					goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces - paddle.getImage().getHeight()/2;
-				}
-			} else {
-				if(numberOfBouncesEvenOrOdd == 0) {
-					// två studs - på väg ner
-					goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight();
-				} else {
-					// en studs - på väg upp
-					goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces - paddle.getImage().getHeight()/2;
-				}
-			}
-			return goal;
 		}
+		if(willBounce) {
+			yDistanceAfterOneBounce = Math.abs(yDistance - distanceToFirstBounce);
+			numberOfBounces = 1;
+			yDistanceAfterAllBounces = yDistanceAfterOneBounce;
+			while((int) yDistanceAfterAllBounces > Settings.getFrameHeight() - ball.getImage().getHeight()) {
+				yDistanceAfterAllBounces = yDistanceAfterOneBounce - (Settings.getFrameHeight() - ball.getImage().getHeight());
+				numberOfBounces++;
+			}
+			numberOfBouncesEvenOrOdd = numberOfBounces % 2; // odd or even
+		} else {
+			if(ball.getDeltaY() < 0) {
+				goal = (int) ((ball.getYPosition() - ball.getImage().getHeight()/2) - (int) yDistanceAfterAllBounces) - paddle.getImage().getHeight()/2;
+				return goal;
+			} else {
+				goal = (int) ((ball.getYPosition() - ball.getImage().getHeight()/2) + (int) yDistanceAfterAllBounces) + paddle.getImage().getHeight()/2;
+				return goal;
+			}
+		}
+
+		if(ball.getDeltaY() < 0) {
+			if(numberOfBouncesEvenOrOdd == 1) {
+				// en studs - på väg ner
+				goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight()/2;
+			} else {
+				// två - på väg upp
+				goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces - paddle.getImage().getHeight()/2;
+			}
+		} else {
+			if(numberOfBouncesEvenOrOdd == 0) {
+				// två studs - på väg ner
+				goal = (int) yDistanceAfterAllBounces + paddle.getImage().getHeight();
+			} else {
+				// en studs - på väg upp
+				goal = Settings.getFrameHeight() - (int) yDistanceAfterAllBounces - paddle.getImage().getHeight()/2;
+			}
+		}
+		return goal;
+	}
+
+	///////////////////////////////////////Effects
+	private Effect effect; //flytta upp sen
+	private boolean effectInGame = false; //flytta upp sen
+	private int oncePerRound = 0; //flytta upp sen
+
+	/**
+	 * Sets an effect in the middle.
+	 * @throws SlickException
+	 */
+	private void setRandomEffect() throws SlickException{
+		effect.getImage().draw(Settings.getFrameWidth()/2, Settings.getFrameHeight()/2);
+		effectInGame = true;
+	}
+
+	/**
+	 * Checks if a player has obtained
+	 * the effect.
+	 * @throws SlickException 
+	 */
+	private void checkEffectCollision() throws SlickException{
+		if(effectInGame == true){
+			//Create 2 shapes identical to the effectImage and ballImage
+			Shape ballShape = new Circle(ball.getXPosition(), ball.getYPosition(), ball.getDiameter()/2);
+			Shape effectShape = new Rectangle(Settings.getFrameWidth()/2, Settings.getFrameHeight()/2, effect.getWidth(), effect.getHeight());
+			if(effectShape.intersects(ballShape)){
+				removeEffect();
+				givePlayerEffect();
+			}
+		}
+	}
+	
+	/**
+	 * Gives the effect to the player
+	 * that obtained it.
+	 * @throws SlickException 
+	 */
+	private void givePlayerEffect() throws SlickException {
+		//paddle to give effect == last one to touch the ball
+		//if paddleLeft touched it last, then: lastPaddle = paddleLeft , och ersätt med lastPaddle nedan
+	
+		if(effect.getEffectType().equals("largerpaddle"))
+			paddleLeft = effect.largerPaddle(paddleLeft);
+		if(effect.getEffectType().equals("smallerpaddle"))
+			paddleLeft = effect.smallerPaddle(paddleLeft);
+		if(effect.getEffectType().equals("smallerball"))
+			ball = effect.smallerBall(ball);
+		if(effect.getEffectType().equals("largerball"))
+			ball = effect.largerBall(ball);
+	}
+	
+	/**
+	 * Removes the effect from the middle.
+	 * (A player obtained it)
+	 * @throws SlickException 
+	 */
+	private void removeEffect() throws SlickException{
+		oncePerRound++;
+		effectInGame = false;
+	}
+
 }

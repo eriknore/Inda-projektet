@@ -183,5 +183,18 @@ public class Ball {
 		isServingLeft = false;
 		isServingRight = false;
 	}
-
+	
+	//////////////////////Effects
+	public int getDiameter(){ //behöver radien för att skapa en Circle shape, 
+		return diameter;
+	}
+	
+	public void shrinkBall(Ball ball) throws SlickException{
+		ballImage = new Image("data/ball/smallball.png");
+	}
+	
+	public void enlargeBall(Ball ball) throws SlickException{
+		ballImage = new Image("data/ball/largeball.png");
+	}
+	
 }

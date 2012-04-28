@@ -102,4 +102,13 @@ public class Paddle {
 			ball.serve(-1);
 		}
 	}
+	
+	////////////////////Effects
+	public void shrinkPaddle() throws SlickException{
+		paddleImage = new Image("data/paddles/smallpaddle.png");
+	}
+	
+	public void enlargePaddle() throws SlickException{
+		paddleImage = new Image("data/paddles/largepaddle.png");
+	}
 }
