@@ -12,19 +12,18 @@ import org.newdawn.slick.SlickException;
  */
 public class Ball {
 
-	private int xPosition, yPosition, diameter;
+	private int xPosition, yPosition;
 	private double deltaX, deltaY, ballSpeed;
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
 
 	public Ball() throws SlickException {
 		ballImage = new Image("data/ball/default.png");
-		diameter = ballImage.getWidth();
 		ballSpeed = 8;
 
 		// simulate a coinflip to decide which player to serve
 		Random rand = new Random();
-		int coinFlip = 1+rand.nextInt(99);
+		int coinFlip = 1+rand.nextInt(100);
 		if(coinFlip > 50) {
 			isServingLeft = true;
 		} else {
@@ -64,6 +63,7 @@ public class Ball {
 	 * @return
 	 */
 	public void moveBall(Paddle left, Paddle right) {
+		int diameter = ballImage.getWidth();
 		if(isServingLeft) {
 			xPosition = left.getX() + left.getImage().getWidth();
 			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
@@ -86,6 +86,7 @@ public class Ball {
 			yPosition = 1;
 			deltaY = -deltaY;
 		}
+		int diameter = ballImage.getWidth();
 		if(yPosition + diameter >= Settings.getFrameHeight()) {
 			yPosition = Settings.getFrameHeight() - diameter -1;
 			deltaY = -deltaY;
@@ -93,6 +94,7 @@ public class Ball {
 	}
 
 	private void checkPaddles(Paddle left, Paddle right) {
+		int diameter = ballImage.getWidth();
 		int edgeOfPaddle = left.getX() + left.getImage().getWidth();
 		// if ball is to the left of left paddle in relation to X-position...
 		if(xPosition + deltaX <= edgeOfPaddle && xPosition + diameter + deltaX >= left.getX()) {
@@ -121,6 +123,7 @@ public class Ball {
 	
 	private double getAngleFromPaddle(Paddle paddle) {
 		int paddleY = paddle.getY();
+		int diameter = ballImage.getWidth();
 		// ball relative to paddle, value is where on paddle the center of ball is
 		double ballValue = (yPosition-(paddleY-diameter)); 	
 		// the angle at which the ball is returned with angle in relation to Y-axel (default angle is 30)
@@ -186,7 +189,7 @@ public class Ball {
 	
 	//////////////////////Effects
 	public int getDiameter(){ //behöver radien för att skapa en Circle shape, 
-		return diameter;
+		return ballImage.getWidth();
 	}
 	
 	public void shrinkBall(Ball ball) throws SlickException{
