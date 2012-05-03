@@ -12,8 +12,8 @@ import org.newdawn.slick.SlickException;
  */
 public class Ball {
 
-	private int xPosition, yPosition;
-	private double deltaX, deltaY, ballSpeed;
+	private int ballSpeed;
+	private double deltaX, deltaY, xPosition, yPosition;
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
 
@@ -23,8 +23,7 @@ public class Ball {
 
 		// simulate a coinflip to decide which player to serve
 		Random rand = new Random();
-		int coinFlip = 1+rand.nextInt(100);
-		if(coinFlip > 50) {
+		if(rand.nextBoolean()) {
 			isServingLeft = true;
 		} else {
 			isServingRight = true;
@@ -36,7 +35,7 @@ public class Ball {
 	 * 
 	 * @return The ball's position on the x-axis
 	 */
-	public int getXPosition(){
+	public double getXPosition(){
 		return xPosition;
 	}
 
@@ -44,7 +43,7 @@ public class Ball {
 	 * 
 	 * @return The ball's position on the y-axis
 	 */
-	public int getYPosition(){
+	public double getYPosition(){
 		return yPosition;
 	}
 
@@ -147,15 +146,20 @@ public class Ball {
 		return angle;
 	}
 
-	public boolean checkOutOfBounds() {
+	public boolean checkOutOfBounds(Paddle left, Paddle right) {
+		int diameter = ballImage.getWidth();
 		if(xPosition - 50 > Settings.getFrameWidth()) {
 			isServingRight = true;
 			deltaY = 0;
+			xPosition = right.getX() - diameter;
+			yPosition = right.getY() + right.getImage().getHeight()/2 - diameter/2;
 			return true;
 		}
 		if(xPosition + 50 < 0) {
 			isServingLeft = true;
 			deltaY = 0;
+			xPosition = left.getX() + left.getImage().getWidth();
+			yPosition = left.getY() + left.getImage().getHeight()/2 - diameter/2;
 			return true;
 		}
 		return false;

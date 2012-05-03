@@ -10,7 +10,7 @@ import org.newdawn.slick.SlickException;
  */
 public class Paddle {
 
-	private int yPosition, xPosition, goal = 0, paddleSpeed = 4;
+	private int yPosition, xPosition, goal = 0, paddleSpeed = 4, rangeAI = 2;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
 	private final int angle = 30;
@@ -93,6 +93,18 @@ public class Paddle {
 	
 	public int getGoal() {
 		return goal;
+	}
+	
+	public void setRange(int range) {
+		if(range < 2) {
+			rangeAI = 2;
+			return;
+		}
+		rangeAI = range;
+	}
+	
+	public int getRange() {
+		return rangeAI;
 	}
 	
 	public void serve(Ball ball) {
