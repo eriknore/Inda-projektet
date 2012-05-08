@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
+import org.newdawn.slick.geom.Shape;
 
 /**
  * Effects can be obtained by hitting them with
@@ -35,22 +37,22 @@ public class Effect {
 
 		switch (randomEffect){
 		case 0: effectImage = new Image("data/effects/largerballeffect.png");
-		effectType = "largerpaddle";
+		effectType = "Larger Paddle";
 		break;
 		case 1: effectImage = new Image("data/effects/smallerballeffect.png");
-		effectType = "smallerpaddle";
+		effectType = "Smaller Paddle";
 		break;
 		case 2: effectImage = new Image("data/effects/smallerballeffect.png");
-		effectType = "smallerball";
+		effectType = "Smaller Ball";
 		break;
 		case 3: effectImage = new Image("data/effects/largerballeffect.png");
-		effectType = "largerball";
+		effectType = "Larger Ball";
 		break;
 		case 4: effectImage = new Image("data/effects/smallerballeffect.png");
-		effectType = "fasterball";
+		effectType = "Faster Ball";
 		break;
 		case 5: effectImage = new Image("data/effects/largerballeffect.png");
-		effectType = "slowerball";
+		effectType = "Slower Ball";
 		break;
 		}
 	}
@@ -136,5 +138,53 @@ public class Effect {
 		// could approach 0 in infinity, which is pretty unlikely
 		ball.setBallSpeed(ball.getBallSpeed()*0.75);
 		return ball;
+	}
+	
+	/**
+	 * Checks if a player has obtained
+	 * the effect.
+	 * @throws SlickException 
+	 */
+	public boolean checkEffectCollision(Ball ball, Paddle paddleLeft, Paddle paddleRight) throws SlickException{
+//		if(effect != null){
+		//Create 2 shapes identical to the effectImage and ballImage
+		Double ballX = ball.getXPosition();
+		Double ballY = ball.getYPosition();			
+		Shape ballShape = new Circle(ballX.intValue(), ballY.intValue(), ball.getDiameter()/2);
+		int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
+		int effectY = Settings.getFrameHeight()/2 - effectImage.getHeight()/2;
+		Shape effectShape = new Circle(effectX, effectY, ball.getDiameter()/2);
+		if(effectShape.intersects(ballShape)){
+			givePlayerEffect(ball, paddleLeft, paddleRight);
+			return true;
+			}
+		return false;
+//		}
+	}
+	
+	/**
+	 * Gives the effect to the player
+	 * that obtained it.
+	 * @throws SlickException 
+	 */
+	private void givePlayerEffect(Ball ball, Paddle paddleLeft, Paddle paddleRight) throws SlickException {
+		Paddle paddleToChange;
+		if(ball.getDeltaX() > 0) {
+			paddleToChange = paddleLeft;
+		} else {
+			paddleToChange = paddleRight;
+		}
+		if(effectType.equals("Larger Paddle"))
+			paddleToChange = largerPaddle(paddleToChange);
+		if(effectType.equals("Smaller Paddle"))
+			paddleToChange = smallerPaddle(paddleToChange);
+		if(effectType.equals("Smaller Ball"))
+			ball = smallerBall(ball);
+		if(effectType.equals("Larger Ball"))
+			ball = largerBall(ball);
+		if(effectType.equals("Slower Ball"))
+			ball = slowerBall(ball);
+		if(effectType.equals("Faster Ball"))
+			ball = fasterBall(ball);
 	}
 }

@@ -9,8 +9,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.state.transition.FadeOutTransition;
@@ -33,10 +31,14 @@ public class GamePlayState extends BasicGameState {
 	private int updateInterval = 0, stopwatch, limit;
 
 	private int leftScore = 0, rightScore = 0;
-	private String playerLeft, playerRight;
+	private String playerLeft, playerRight, effectDescription;
+	private boolean drawEffect = false;
 
-	private int AIDelay = 0;
+	private int delay = 0;
 	private Random rand = new Random();
+	private AI ai;
+	private Effect effect;
+
 
 	public GamePlayState(int stateID) {
 		this.stateID = stateID;
@@ -71,7 +73,7 @@ public class GamePlayState extends BasicGameState {
 			playerLeft = "PC";
 		}
 		limit = 1 + rand.nextInt(30000);
-//		stopwatch = 0;
+		ai = new AI(ball);
 	}
 
 	@Override
@@ -84,9 +86,18 @@ public class GamePlayState extends BasicGameState {
 			Settings.setGameIsRunning(true);
 		}
 		
+		if(drawEffect) {
+			delay += delta;
+			if(delay > 1000) {
+				drawEffect = false;
+				delay = 0;
+			}
+		}
+		
 		stopwatch += delta;
 		if(stopwatch > limit) {
 			effect = new Effect();
+			effectDescription = effect.getEffectType();
 			limit = 1 + rand.nextInt(30000);
 			stopwatch = 0;
 		}
@@ -132,25 +143,11 @@ public class GamePlayState extends BasicGameState {
 				paddleRight.serve(ball);
 		}
 
-		if(!paddleRight.isHuman()) {
-			if(Settings.getDifficulty().equals("Easy")) {
-				getAIEasy(paddleRight);
-			} if(Settings.getDifficulty().equals("Medium")) {
-				getAIMedium(paddleRight);
-			} else {
-				getAIHard(paddleRight);
-			}
-		}
-		if (!paddleLeft.isHuman()) {
-			if(Settings.getDifficulty().equals("Easy")) {
-				getAIEasy(paddleLeft);
-			} if(Settings.getDifficulty().equals("Medium")) {
-				getAIMedium(paddleLeft);
-			} else {
-				getAIHard(paddleLeft);
-			}
-		}
-
+		if(!paddleRight.isHuman())
+			ai.getAIMovement(paddleRight, ball);
+		if (!paddleLeft.isHuman())
+			ai.getAIMovement(paddleLeft, ball);
+		
 		ball.moveBall(paddleLeft, paddleRight);
 
 		if(ball.checkOutOfBounds(paddleLeft, paddleRight))
@@ -158,11 +155,12 @@ public class GamePlayState extends BasicGameState {
 
 		updateInterval -= updateLimit;
 		
-		
-		//effects
-	
-		checkEffectCollision();
-		//effects
+		if(effect != null) {
+			if(effect.checkEffectCollision(ball, paddleLeft, paddleRight)) {
+				effect = null;
+				drawEffect = true;
+			}
+		}
 		
 	}
 
@@ -172,14 +170,15 @@ public class GamePlayState extends BasicGameState {
 			throws SlickException {
 		background.draw(0, 0);
 		
-		//effects
 		if(effect != null){
 			Image effectImage = effect.getImage();
 			int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
 			int effectY = Settings.getFrameHeight()/2 - effectImage.getWidth()/2;
 			effectImage.draw(effectX, effectY);
 		}
-		//effects
+		if(drawEffect) {
+			g.drawString(effectDescription + "!", Settings.getFrameWidth()/2+10, Settings.getFrameHeight()/2);
+		}
 		
 		paddleLeft.getImage().draw(paddleLeftXPosition, paddleLeft.getY());
 		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
@@ -200,227 +199,20 @@ public class GamePlayState extends BasicGameState {
 	private void playerScore() throws SlickException{
 		if(ball.getXPosition() > Settings.getFrameWidth()/2){
 			leftScore++;
-			reset();
 		}else{
 			rightScore++;
-			reset();
 		}
-	}
-
-	private void getAIEasy(Paddle paddle) {
-		AIServe(paddle);
-
-		int paddleHeight = paddle.getImage().getHeight();
-		int centerOfPaddle = paddle.getY() + paddleHeight/2 + paddle.getImage().getWidth()/2;
-		int currentGoal = paddle.getGoal();
-		if(centerOfPaddle + 2 >= currentGoal && centerOfPaddle - 2 <= currentGoal) { 
-			int goal = paddleHeight/2 + rand.nextInt(Settings.getFrameHeight()-paddleHeight);
-			paddle.setGoal(goal);
-			return;
-		}
-		if(centerOfPaddle > currentGoal) {
-			paddle.paddleUp();
-		} else if(centerOfPaddle < currentGoal) {
-			paddle.paddleDown();
-		}
-	}
-
-	private void getAIMedium(Paddle paddle) {
-		int paddleHeight = paddle.getImage().getHeight();
-		if(AIServe(paddle) && AIDelay < 200)
-			paddle.setGoal(rand.nextInt(Settings.getFrameHeight()-paddleHeight/2));
-
-		int thisPaddleX = paddle.getX();
-		Double ballX = ball.getXPosition();
-		Double ballY = ball.getYPosition();
-		double ballDeltaX = ball.getDeltaX();
-		if(thisPaddleX == paddleLeftXPosition) {
-			if(ballDeltaX > 0 && ballX < thisPaddleX + paddle.getImage().getWidth() + 10) {
-				paddle.setGoal(Settings.getFrameHeight()/2);
-				paddle.setRange(rand.nextInt(paddleHeight/2));
-			} else if(ball.getDeltaX() < 0) {
-				paddle.setGoal(ballY.intValue() - ball.getImage().getHeight()/2);
-			}
-		} else {
-			if(ballDeltaX < 0 && ballX + ball.getImage().getWidth() < thisPaddleX - 10) {
-				paddle.setGoal(Settings.getFrameHeight()/2);
-				paddle.setRange(rand.nextInt(paddleHeight/2));
-			} else if(ball.getDeltaX() > 0) {
-				paddle.setGoal(ballY.intValue() - ball.getImage().getHeight()/2);
-			}
-		}
-
-		int thisPaddleY = paddle.getY();
-		int centerOfPaddle = thisPaddleY + paddleHeight/2;
-		int currentGoal = paddle.getGoal();
-		int range = paddle.getRange();
-		if((centerOfPaddle + range >= currentGoal && centerOfPaddle - range <= currentGoal))
-			return;
-		if(centerOfPaddle > currentGoal && thisPaddleY > 0) {
-			paddle.paddleUp();
-		} else if(centerOfPaddle < currentGoal && thisPaddleY < Settings.getFrameHeight()) {
-			paddle.paddleDown();
-		}
-	}
-
-	private void getAIHard(Paddle paddle) {
-		int paddleHeight = paddle.getImage().getHeight();
-		if(AIServe(paddle) && AIDelay < 200)
-			paddle.setGoal(rand.nextInt(Settings.getFrameHeight()-paddleHeight/2));
-
-		int diameter = ball.getImage().getWidth();
-		int thisPaddleX = paddle.getX();
-		Double ballX = ball.getXPosition();
-		double ballDeltaX = ball.getDeltaX();
-		if(thisPaddleX == paddleRightXPosition) {
-			if(ballDeltaX > 0 && ballX.intValue() < paddleLeft.getX() + paddleLeft.getImage().getWidth() + 10) {
-				paddle.setGoal(calculateGoalFinal(paddle));
-				paddle.setRange(rand.nextInt(paddleHeight/2));
-			} else if (ballDeltaX < 0 && ballX.intValue() + diameter < thisPaddleX - 10) {
-				paddle.setGoal(Settings.getFrameWidth()/2 - paddleHeight);
-				paddle.setRange(2);
-			}
-		} else {
-			if(ballDeltaX < 0 && ballX.intValue() + diameter > paddleRight.getX() - 10) {
-				paddle.setGoal(calculateGoalFinal(paddle));
-				paddle.setRange(rand.nextInt(paddleHeight/2));
-			} else if(ballDeltaX > 0 && ballX.intValue() < thisPaddleX + paddle.getImage().getWidth() + 10) {
-				paddle.setGoal(Settings.getFrameWidth()/2 - paddleHeight);
-				paddle.setRange(2);
-			}
-		}
-
-		int thisPaddleY = paddle.getY();
-		int centerOfPaddle = thisPaddleY + paddle.getImage().getHeight()/2;
-		int currentGoal = paddle.getGoal() + diameter/2;
-		int range = paddle.getRange();
-		if((centerOfPaddle + range >= currentGoal && centerOfPaddle - range <= currentGoal))
-			return;
-		if(centerOfPaddle > currentGoal && thisPaddleY > 0) {
-			paddle.paddleUp();
-		} else if(centerOfPaddle < currentGoal && thisPaddleY < Settings.getFrameHeight()) {
-			paddle.paddleDown();
-		}
-	}
-
-	private boolean AIServe(Paddle paddle) {
-		int paddleX = paddle.getX();
-		int width = Settings.getFrameWidth();
-
-		if((paddleX < width/2 && ball.isServingLeft()) || (paddleX > width/2 && ball.isServingRight())) {
-			AIDelay += updateInterval;
-			if(AIDelay > 1500) {
-				paddle.serve(ball);
-				AIDelay = 0;
-			}
-			return true;
-		}
-		return false;
-	}
-	
-	private int calculateGoalFinal(Paddle paddle) {
-		int diameter = ball.getImage().getHeight();
-		Double ballY = ball.getYPosition();
-		double deltaY = ball.getDeltaY();
-		if(deltaY == 0)
-			return ballY.intValue() + diameter;
-
-		Double ballX = ball.getXPosition();
-		double deltaX = ball.getDeltaX();
-		int numberOfFrames = 0;
-		if(paddle.getX() == paddleLeftXPosition) {
-			while(ballX.intValue() > paddleLeftXPosition + paddleLeft.getImage().getWidth()) {
-				numberOfFrames++;
-				ballX += deltaX;
-			}
-		} else if(paddle.getX() == paddleRightXPosition) {
-			while(ballX.intValue() + diameter < paddleRightXPosition) {
-				numberOfFrames++;
-				ballX += deltaX;
-			}
-		}
-		
-		for(int i = 0; i <= numberOfFrames; i++) {
-			if(ballY.intValue() <= 0) {
-				ballY = 0.0;
-				deltaY = -deltaY;
-			}
-			if(ballY.intValue() + diameter >= Settings.getFrameHeight()) {
-				double edge = Settings.getFrameHeight() - diameter; 
-				ballY = edge;
-				deltaY = -deltaY;
-			}
-			ballY += deltaY;
-		}
-		return ballY.intValue();
-	}
-
-
-	///////////////////////////////////////Effects
-	private Effect effect; //flytta upp sen
-//	private boolean effectObtained = false; //flytta upp sen
-
-	/**
-	 * Checks if a player has obtained
-	 * the effect.
-	 * @throws SlickException 
-	 */
-	private void checkEffectCollision() throws SlickException{
-		if(effect != null){
-			//Create 2 shapes identical to the effectImage and ballImage
-			Double ballX = ball.getXPosition();
-			Double ballY = ball.getYPosition();			
-			Shape ballShape = new Circle(ballX.intValue(), ballY.intValue(), ball.getDiameter()/2);
-			Image effectImage = effect.getImage();
-			int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
-			int effectY = Settings.getFrameHeight()/2 - effectImage.getHeight()/2;
-			Shape effectShape = new Circle(effectX, effectY, ball.getDiameter()/2);
-			if(effectShape.intersects(ballShape)){
-				givePlayerEffect();
-//				effectObtained = true;
-				effect = null;
-			}
-		}
-	}
-	
-	/**
-	 * Gives the effect to the player
-	 * that obtained it.
-	 * @throws SlickException 
-	 */
-	private void givePlayerEffect() throws SlickException {
-		//paddle to give effect == last one to touch the ball
-		//if paddleLeft touched it last, then: lastPaddle = paddleLeft , och ersätt med lastPaddle nedan
-	
-		Paddle paddleToChange;
-		if(ball.getDeltaX() > 0) {
-			paddleToChange = paddleLeft;
-		} else {
-			paddleToChange = paddleRight;
-		}
-		if(effect.getEffectType().equals("largerpaddle"))
-			paddleToChange = effect.largerPaddle(paddleToChange);
-		if(effect.getEffectType().equals("smallerpaddle"))
-			paddleToChange = effect.smallerPaddle(paddleToChange);
-		if(effect.getEffectType().equals("smallerball"))
-			ball = effect.smallerBall(ball);
-		if(effect.getEffectType().equals("largerball"))
-			ball = effect.largerBall(ball);
-		if(effect.getEffectType().equals("slowerball"))
-			ball = effect.slowerBall(ball);
-		if(effect.getEffectType().equals("fasterball"))
-			ball = effect.fasterBall(ball);
+		reset();
 	}
 	
 	private void reset() throws SlickException{
 		paddleLeft = new Paddle(paddleLeftXPosition, Settings.isLeftPaddleHuman()); // both paddles start at same y-position
 		paddleRightXPosition = Settings.getFrameWidth()-paddleLeftXPosition-paddleLeft.getImage().getWidth();
 		paddleRight = new Paddle(paddleRightXPosition, Settings.isRightPaddleHuman());
-		ball = new Ball();
+		ball.resetBall();
 		limit = 1 + rand.nextInt(30000);
 		stopwatch = 0;
 		effect = null;
-//		effectObtained = false;
 	}
 
 }

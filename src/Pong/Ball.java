@@ -152,14 +152,14 @@ public class Ball {
 			isServingRight = true;
 			deltaY = 0;
 			xPosition = right.getX() - diameter;
-			yPosition = right.getY() + right.getImage().getHeight()/2 - diameter/2;
+			yPosition = Settings.getFrameHeight()/2 - diameter/2;
 			return true;
 		}
 		if(xPosition + 50 < 0) {
 			isServingLeft = true;
 			deltaY = 0;
 			xPosition = left.getX() + left.getImage().getWidth();
-			yPosition = left.getY() + left.getImage().getHeight()/2 - diameter/2;
+			yPosition = Settings.getFrameHeight()/2 - diameter/2;
 			return true;
 		}
 		return false;
@@ -202,6 +202,11 @@ public class Ball {
 	
 	public void enlargeBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/largeball.png");
+	}
+	
+	public void resetBall() throws SlickException{
+		ballImage = new Image("data/ball/default.png");
+		ballSpeed = 8;
 	}
 	
 	public void setBallSpeed(double newSpeed) {

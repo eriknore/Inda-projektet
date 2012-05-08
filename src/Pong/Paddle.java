@@ -30,12 +30,8 @@ public class Paddle {
 		this.xPosition = xPosition;
 		isHuman = humanPlayer;
 		
-		if(!isHuman) {
-			goal = Settings.getFrameHeight()/2;
-			if(Settings.getDifficulty().equals("Easy"))
-				paddleSpeed = 2;
-		}
-		
+		if(!isHuman && Settings.getDifficulty().equals("Easy"))
+			paddleSpeed = 2;
 	}
 
 	/**
@@ -122,5 +118,13 @@ public class Paddle {
 	
 	public void enlargePaddle() throws SlickException{
 		paddleImage = new Image("data/paddles/largepaddle.png");
+	}
+	
+	public void setPaddleSpeed(int newSpeed) {
+		paddleSpeed = newSpeed;
+	}
+	
+	public boolean isLeft() {
+		return (xPosition < Settings.getFrameWidth()/2);
 	}
 }
