@@ -12,7 +12,7 @@ import org.newdawn.slick.SlickException;
  */
 public class Ball {
 
-	private int ballSpeed;
+	private double ballSpeed;
 	private double deltaX, deltaY, xPosition, yPosition;
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
@@ -202,6 +202,10 @@ public class Ball {
 	
 	public void enlargeBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/largeball.png");
+	}
+	
+	public void setBallSpeed(double newSpeed) {
+		ballSpeed = newSpeed;
 	}
 	
 }

@@ -10,7 +10,6 @@ import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -24,8 +23,6 @@ import org.newdawn.slick.state.transition.Transition;
  */
 public class GamePlayState extends BasicGameState {
 
-	private static final boolean DEBUG = false;
-
 	private int stateID = -1;
 	private Image background;
 	// start-position, width between paddle and frame
@@ -33,7 +30,7 @@ public class GamePlayState extends BasicGameState {
 	private int paddleRightXPosition;
 	private Paddle paddleLeft, paddleRight;
 	private Ball ball;
-	private int updateInterval = 0;
+	private int updateInterval = 0, stopwatch, limit;
 
 	private int leftScore = 0, rightScore = 0;
 	private String playerLeft, playerRight;
@@ -73,11 +70,8 @@ public class GamePlayState extends BasicGameState {
 		} else {
 			playerLeft = "PC";
 		}
-		
-		
-		////////////////////effects
-		effect = new Effect();
-		///////////////////////
+		limit = 1 + rand.nextInt(30000);
+//		stopwatch = 0;
 	}
 
 	@Override
@@ -89,9 +83,22 @@ public class GamePlayState extends BasicGameState {
 			init(container, sbg);
 			Settings.setGameIsRunning(true);
 		}
+		
+		stopwatch += delta;
+		if(stopwatch > limit) {
+			effect = new Effect();
+			limit = 1 + rand.nextInt(30000);
+			stopwatch = 0;
+		}
+		
+		if(stopwatch >= 30000) {
+			limit = 1 + rand.nextInt(30000);
+			stopwatch = 0;
+		}
+		
 		updateInterval += delta;
-		int limit = 20;
-		if(updateInterval < limit)
+		int updateLimit = 20;
+		if(updateInterval < updateLimit)
 			return;
 
 		Transition t = new FadeOutTransition();
@@ -149,10 +156,11 @@ public class GamePlayState extends BasicGameState {
 		if(ball.checkOutOfBounds(paddleLeft, paddleRight))
 			playerScore();
 
-		updateInterval -= limit;
+		updateInterval -= updateLimit;
 		
 		
 		//effects
+	
 		checkEffectCollision();
 		//effects
 		
@@ -165,8 +173,11 @@ public class GamePlayState extends BasicGameState {
 		background.draw(0, 0);
 		
 		//effects
-		if(oncePerRound == 0){
-		setRandomEffect();
+		if(effect != null){
+			Image effectImage = effect.getImage();
+			int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
+			int effectY = Settings.getFrameHeight()/2 - effectImage.getWidth()/2;
+			effectImage.draw(effectX, effectY);
 		}
 		//effects
 		
@@ -176,8 +187,6 @@ public class GamePlayState extends BasicGameState {
 		Double ballY = ball.getYPosition();
 		ball.getImage().draw(ballX.intValue(), ballY.intValue());
 
-		//		g.drawString("" + rightScore, 500, 40);
-		//		g.drawString("" + leftScore, 300, 40);
 		g.drawString("Press 'H' for help", Settings.getFrameWidth()-200, Settings.getFrameHeight()-30);
 
 		g.drawString(playerLeft + ":    " + leftScore, 200, 40);
@@ -185,13 +194,16 @@ public class GamePlayState extends BasicGameState {
 	}
 
 	/**
+	 * @throws SlickException 
 	 * 
 	 */
-	private void playerScore(){
+	private void playerScore() throws SlickException{
 		if(ball.getXPosition() > Settings.getFrameWidth()/2){
 			leftScore++;
+			reset();
 		}else{
 			rightScore++;
+			reset();
 		}
 	}
 
@@ -346,17 +358,7 @@ public class GamePlayState extends BasicGameState {
 
 	///////////////////////////////////////Effects
 	private Effect effect; //flytta upp sen
-	private boolean effectInGame = false; //flytta upp sen
-	private int oncePerRound = 0; //flytta upp sen
-
-	/**
-	 * Sets an effect in the middle.
-	 * @throws SlickException
-	 */
-	private void setRandomEffect() throws SlickException{
-		effect.getImage().draw(Settings.getFrameWidth()/2, Settings.getFrameHeight()/2);
-		effectInGame = true;
-	}
+//	private boolean effectObtained = false; //flytta upp sen
 
 	/**
 	 * Checks if a player has obtained
@@ -364,15 +366,19 @@ public class GamePlayState extends BasicGameState {
 	 * @throws SlickException 
 	 */
 	private void checkEffectCollision() throws SlickException{
-		if(effectInGame == true){
+		if(effect != null){
 			//Create 2 shapes identical to the effectImage and ballImage
 			Double ballX = ball.getXPosition();
 			Double ballY = ball.getYPosition();			
 			Shape ballShape = new Circle(ballX.intValue(), ballY.intValue(), ball.getDiameter()/2);
-			Shape effectShape = new Rectangle(Settings.getFrameWidth()/2, Settings.getFrameHeight()/2, effect.getWidth(), effect.getHeight());
+			Image effectImage = effect.getImage();
+			int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
+			int effectY = Settings.getFrameHeight()/2 - effectImage.getHeight()/2;
+			Shape effectShape = new Circle(effectX, effectY, ball.getDiameter()/2);
 			if(effectShape.intersects(ballShape)){
-				removeEffect();
 				givePlayerEffect();
+//				effectObtained = true;
+				effect = null;
 			}
 		}
 	}
@@ -386,24 +392,35 @@ public class GamePlayState extends BasicGameState {
 		//paddle to give effect == last one to touch the ball
 		//if paddleLeft touched it last, then: lastPaddle = paddleLeft , och ersätt med lastPaddle nedan
 	
+		Paddle paddleToChange;
+		if(ball.getDeltaX() > 0) {
+			paddleToChange = paddleLeft;
+		} else {
+			paddleToChange = paddleRight;
+		}
 		if(effect.getEffectType().equals("largerpaddle"))
-			paddleLeft = effect.largerPaddle(paddleLeft);
+			paddleToChange = effect.largerPaddle(paddleToChange);
 		if(effect.getEffectType().equals("smallerpaddle"))
-			paddleLeft = effect.smallerPaddle(paddleLeft);
+			paddleToChange = effect.smallerPaddle(paddleToChange);
 		if(effect.getEffectType().equals("smallerball"))
 			ball = effect.smallerBall(ball);
 		if(effect.getEffectType().equals("largerball"))
 			ball = effect.largerBall(ball);
+		if(effect.getEffectType().equals("slowerball"))
+			ball = effect.slowerBall(ball);
+		if(effect.getEffectType().equals("fasterball"))
+			ball = effect.fasterBall(ball);
 	}
 	
-	/**
-	 * Removes the effect from the middle.
-	 * (A player obtained it)
-	 * @throws SlickException 
-	 */
-	private void removeEffect() throws SlickException{
-		oncePerRound++;
-		effectInGame = false;
+	private void reset() throws SlickException{
+		paddleLeft = new Paddle(paddleLeftXPosition, Settings.isLeftPaddleHuman()); // both paddles start at same y-position
+		paddleRightXPosition = Settings.getFrameWidth()-paddleLeftXPosition-paddleLeft.getImage().getWidth();
+		paddleRight = new Paddle(paddleRightXPosition, Settings.isRightPaddleHuman());
+		ball = new Ball();
+		limit = 1 + rand.nextInt(30000);
+		stopwatch = 0;
+		effect = null;
+//		effectObtained = false;
 	}
 
 }
