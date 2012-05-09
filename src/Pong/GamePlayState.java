@@ -1,8 +1,5 @@
 package Pong;
 
-
-
-
 import java.util.Random;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -38,6 +35,8 @@ public class GamePlayState extends BasicGameState {
 	private Random rand = new Random();
 	private AI ai;
 	private Effect effect;
+	
+	private final boolean developerMode = false;
 
 
 	public GamePlayState(int stateID) {
@@ -56,6 +55,7 @@ public class GamePlayState extends BasicGameState {
 
 	@Override
 	public void init(GameContainer container, StateBasedGame sbg) throws SlickException {
+		container.setShowFPS(false); 
 		background = new Image("data/backgrounds/default.png");
 		paddleLeft = new Paddle(paddleLeftXPosition, Settings.isLeftPaddleHuman()); // both paddles start at same y-position
 		paddleRightXPosition = Settings.getFrameWidth()-paddleLeftXPosition-paddleLeft.getImage().getWidth();
@@ -113,56 +113,24 @@ public class GamePlayState extends BasicGameState {
 		if(updateInterval < updateLimit)
 			return;
 
-		Transition t = new FadeOutTransition();
-
-		Input input = container.getInput();
-
-		if(input.isKeyDown(Input.KEY_ESCAPE)) 
-			sbg.enterState(PongGame.MAINMENUSTATE, t, t);
-
-		if(input.isKeyDown(Input.KEY_H)) 
-			sbg.enterState(PongGame.HELPSTATE, t, t);	
-
-		if(paddleLeft.isHuman()) {
-			if(input.isKeyDown(Input.KEY_W))
-				paddleLeft.paddleUp();
-
-			if(input.isKeyDown(Input.KEY_S))
-				paddleLeft.paddleDown();
-
-			if(input.isKeyDown(Input.KEY_D) && ball.isServingLeft())
-				paddleLeft.serve(ball);
-		}
-		if(paddleRight.isHuman()) {
-			if(input.isKeyDown(Input.KEY_UP))
-				paddleRight.paddleUp();
-
-			if(input.isKeyDown(Input.KEY_DOWN))
-				paddleRight.paddleDown();
-
-			if(input.isKeyDown(Input.KEY_LEFT) && ball.isServingRight())
-				paddleRight.serve(ball);
-		}
-
+		getInput(container, sbg);
+		
 		if(!paddleRight.isHuman())
 			ai.getAIMovement(paddleRight, ball);
 		if (!paddleLeft.isHuman())
 			ai.getAIMovement(paddleLeft, ball);
 		
 		ball.moveBall(paddleLeft, paddleRight);
-
-		if(ball.checkOutOfBounds(paddleLeft, paddleRight))
-			playerScore();
-
-		updateInterval -= updateLimit;
-		
 		if(effect != null) {
 			if(effect.checkEffectCollision(ball, paddleLeft, paddleRight)) {
 				effect = null;
 				drawEffect = true;
 			}
 		}
-		
+		if(ball.checkOutOfBounds(paddleLeft, paddleRight))
+			playerScore();
+
+		updateInterval -= updateLimit;		
 	}
 
 
@@ -192,6 +160,61 @@ public class GamePlayState extends BasicGameState {
 	}
 
 	/**
+	 * @param container
+	 * @param sbg
+	 * @throws SlickException
+	 */
+	private void getInput(GameContainer container, StateBasedGame sbg) throws SlickException {
+		Transition t = new FadeOutTransition();
+
+		Input input = container.getInput();
+
+		if(input.isKeyDown(Input.KEY_ESCAPE)) 
+			sbg.enterState(PongGame.MAINMENUSTATE, t, t);
+		if(input.isKeyDown(Input.KEY_H)) 
+			sbg.enterState(PongGame.HELPSTATE, t, t);	
+
+		if(paddleLeft.isHuman()) {
+			if(input.isKeyDown(Input.KEY_W))
+				paddleLeft.paddleUp();
+			if(input.isKeyDown(Input.KEY_S))
+				paddleLeft.paddleDown();
+			if(input.isKeyDown(Input.KEY_D) && ball.isServingLeft())
+				paddleLeft.serve(ball);
+		}
+		if(paddleRight.isHuman()) {
+			if(input.isKeyDown(Input.KEY_UP))
+				paddleRight.paddleUp();
+			if(input.isKeyDown(Input.KEY_DOWN))
+				paddleRight.paddleDown();
+			if(input.isKeyDown(Input.KEY_LEFT) && ball.isServingRight())
+				paddleRight.serve(ball);
+		}
+		
+		if(developerMode) {
+			if(input.isKeyDown(Input.KEY_F1))
+				ball.enlargeBall(ball);
+			if(input.isKeyDown(Input.KEY_F2))
+				ball.shrinkBall(ball);
+			if(input.isKeyPressed(Input.KEY_F3))
+				ball.setBallSpeed((float) (ball.getBallSpeed()*1.25));
+			if(input.isKeyPressed(Input.KEY_F4))
+				ball.setBallSpeed((float) (ball.getBallSpeed()*0.75));
+			if(input.isKeyDown(Input.KEY_F5))
+				paddleLeft.enlargePaddle();
+			if(input.isKeyDown(Input.KEY_F6))
+				paddleRight.enlargePaddle();
+			if(input.isKeyDown(Input.KEY_F7))
+				paddleLeft.shrinkPaddle();
+			if(input.isKeyDown(Input.KEY_F8))
+				paddleRight.shrinkPaddle();
+			if(input.isKeyDown(Input.KEY_F12)) {
+				paddleRight.resetPaddle();
+				ball.resetBall();
+			}
+		}
+	}
+	/**
 	 * @throws SlickException 
 	 * 
 	 */
@@ -204,6 +227,9 @@ public class GamePlayState extends BasicGameState {
 		reset();
 	}
 	
+	/**
+	 * @throws SlickException
+	 */
 	private void reset() throws SlickException{
 		paddleLeft = new Paddle(paddleLeftXPosition, Settings.isLeftPaddleHuman()); // both paddles start at same y-position
 		paddleRightXPosition = Settings.getFrameWidth()-paddleLeftXPosition-paddleLeft.getImage().getWidth();

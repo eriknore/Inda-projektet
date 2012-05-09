@@ -120,14 +120,20 @@ public class Paddle {
 		}
 	}
 
-	public void shrinkPaddle() throws SlickException{
+	public void shrinkPaddle() throws SlickException {
 		paddleImage = new Image("data/paddles/smallpaddle.png");
 		dimensions[0] = paddleImage.getWidth();
 		dimensions[1] = paddleImage.getHeight();
 	}
 	
-	public void enlargePaddle() throws SlickException{
+	public void enlargePaddle() throws SlickException {
 		paddleImage = new Image("data/paddles/largepaddle.png");
+		dimensions[0] = paddleImage.getWidth();
+		dimensions[1] = paddleImage.getHeight();
+	}
+	
+	public void resetPaddle() throws SlickException {
+		paddleImage = new Image("data/paddles/paddle.png");
 		dimensions[0] = paddleImage.getWidth();
 		dimensions[1] = paddleImage.getHeight();
 	}

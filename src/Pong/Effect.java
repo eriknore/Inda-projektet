@@ -125,7 +125,7 @@ public class Effect {
 	 * A negative effect, increases the ball speed
 	 * @throws SlickException 
 	 */
-	public Ball fasterBall(Ball ball) throws SlickException{
+	private Ball fasterBall(Ball ball) throws SlickException{
 		ball.setBallSpeed((float) (ball.getBallSpeed()*1.25));
 		return ball;
 	}
@@ -134,7 +134,7 @@ public class Effect {
 	 * A positive effect, decreases the ball speed
 	 * @throws SlickException 
 	 */
-	public Ball slowerBall(Ball ball) throws SlickException{
+	private Ball slowerBall(Ball ball) throws SlickException{
 		// could approach 0 in infinity, but that's pretty unlikely
 		ball.setBallSpeed((float) (ball.getBallSpeed()*0.75));
 		return ball;

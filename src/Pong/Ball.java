@@ -8,7 +8,7 @@ import org.newdawn.slick.SlickException;
 
 /**
  * @author Erik Norell & Daniel Aceituno 
- * @version 2012-04-16
+ * @version 2012-05-09
  */
 public class Ball {
 
@@ -18,6 +18,11 @@ public class Ball {
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
 
+	/**
+	 * Creates a new ball and sets who get to start serving 
+	 * (simulating a coinflip)
+	 * @throws SlickException
+	 */
 	public Ball() throws SlickException {
 		ballImage = new Image("data/ball/default.png");
 		radius = ballImage.getWidth()/2;
@@ -34,14 +39,15 @@ public class Ball {
 	}
 
 	/**
-	 * 
-	 * @return The ball's position on the x-axis
+	 * Returns the ball's coordinates
+	 * @return The ball's coordinates in form [x, y]
 	 */
 	public float[] getCoordinates(){
 		return coordinates;
 	}
 
 	/**
+	 * Returns the image of the ball
 	 * @return Image of the ball
 	 */
 	public Image getImage() {
@@ -49,11 +55,10 @@ public class Ball {
 	}
 
 	/**
-	 * @param paddleLeft
-	 * @param paddleRight
-	 * @param topWall
-	 * @param bottomWall
-	 * @return
+	 * Moves the ball one frame, checking for if someone is serving,
+	 * wall-collisions and paddle-collisions.
+	 * @param left Left Paddle
+	 * @param right Right Paddle
 	 */
 	public void moveBall(Paddle left, Paddle right) {
 		
@@ -74,6 +79,10 @@ public class Ball {
 		return;
 	}
 
+	/**
+	 * Checks if the ball collides with a wall and adjusts
+	 * direction accordingly
+	 */
 	private void checkWalls() {
 		if(coordinates[1] <= 0) {
 			coordinates[1] = 1;
@@ -86,6 +95,12 @@ public class Ball {
 		}
 	}
 
+	/**
+	 * Checks if the pall collides with a paddle and adjusts
+	 * deltaX and deltaY accordingly if so.
+	 * @param left Left Paddle
+	 * @param right Right Paddle
+	 */
 	private void checkPaddles(Paddle left, Paddle right) {
 		
 		int edgeOfPaddle = left.getCoordinates()[0] + left.getWidth();
@@ -114,6 +129,13 @@ public class Ball {
 		}
 	}
 	
+	/**
+	 * Calculates the angle at which the ball bounces of a paddle, 
+	 * the further from center the greater the angle (default is 30-120 degrees,
+	 *  paddle as reference)
+	 * @param paddle The paddle which the ball collides with
+	 * @return The angle at which the ball travels after colliding with a paddle
+	 */
 	private float getAngleFromPaddle(Paddle paddle) {
 		int paddleY = paddle.getCoordinates()[1];
 		
@@ -140,6 +162,13 @@ public class Ball {
 		return angle.floatValue();
 	}
 
+	/**
+	 * Checks if ball is behind each paddle and out of screen.  If so
+	 * returns true and resets ball coordinates and serving-variable, otherwise false.
+	 * @param left Left paddle
+	 * @param right Right paddle
+	 * @return True if ball is out-of-screen, false otherwise
+	 */
 	public boolean checkOutOfBounds(Paddle left, Paddle right) {
 		
 		if(coordinates[0] - 50 > Settings.getFrameWidth()) {
@@ -159,52 +188,103 @@ public class Ball {
 		return false;
 	}
 	
+	/**
+	 * Returns true if left paddle is serving, otherwise false
+	 * @return True if left paddle is serving
+	 */
 	public boolean isServingLeft() {
 		return isServingLeft;
 	}
 	
+	/**
+	 * Returns true if right paddle is serving, otherwise false
+	 * @return True if right paddle is serving
+	 */
 	public boolean isServingRight() {
 		return isServingRight;
 	}
 	
+	/**
+	 * Returns the rate of movement and direction in 
+	 * y-direction of the ball
+	 * @return deltaY - the movement per frame in y-direction
+	 */
 	public float getDeltaY() {
 		return deltaY;
 	}
 	
+	/**
+	 * Returns the rate of movement and direction in 
+	 * x-direction of the ball
+	 * @return deltaY - the movement per frame in x-direction
+	 */
 	public float getDeltaX() {
 		return deltaX;
 	}
 	
+	/**
+	 * Returns the speed of the ball
+	 * @return The speed of the ball
+	 */
 	public float getBallSpeed() {
 		return ballSpeed;
 	}
 	
+	/**
+	 * Serves the ball by setting the speed (in x-direction, 
+	 * y-direction is 0) to positive or negative. Also resets
+	 * indication that left or right paddle is serving
+	 * @param direction
+	 */
 	public void serve(int direction) {
 		deltaX = direction*ballSpeed;
 		isServingLeft = false;
 		isServingRight = false;
 	}
 	
+	/**
+	 * Returns the radius of the ball
+	 * @return The radius of the ball
+	 */
 	public int getRadius(){
 		return radius;
 	}
 	
+	/**
+	 * Shrinks the ball, used as a power-down
+	 * @param ball The ball
+	 * @throws SlickException
+	 */
 	public void shrinkBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/smallball.png");
 		radius = ballImage.getWidth()/2;
 	}
 	
+	/**
+	 * Enlarges the ball, used as a power-up
+	 * @param ball The ball
+	 * @throws SlickException
+	 */
 	public void enlargeBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/largeball.png");
 		radius = ballImage.getWidth()/2;
 	}
 	
+	
+	/**
+	 * Resets the image and speed to default
+	 * @throws SlickException
+	 */
 	public void resetBall() throws SlickException{
 		ballImage = new Image("data/ball/default.png");
 		radius = ballImage.getWidth()/2;
 		ballSpeed = 8;
 	}
 	
+	/**
+	 * Sets a new speed for the ball
+	 * @param newSpeed The new speed of the ball
+	 */
 	public void setBallSpeed(float newSpeed) {
 		ballSpeed = newSpeed;
 	}
