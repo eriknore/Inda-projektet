@@ -73,7 +73,8 @@ public class GamePlayState extends BasicGameState {
 			playerLeft = "PC";
 		}
 		limit = 1 + rand.nextInt(30000);
-		ai = new AI(ball);
+		if(!paddleLeft.isHuman() || !paddleRight.isHuman())
+			ai = new AI();
 	}
 
 	@Override
@@ -180,11 +181,9 @@ public class GamePlayState extends BasicGameState {
 			g.drawString(effectDescription + "!", Settings.getFrameWidth()/2+10, Settings.getFrameHeight()/2);
 		}
 		
-		paddleLeft.getImage().draw(paddleLeftXPosition, paddleLeft.getY());
-		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getY());
-		Double ballX = ball.getXPosition();
-		Double ballY = ball.getYPosition();
-		ball.getImage().draw(ballX.intValue(), ballY.intValue());
+		paddleLeft.getImage().draw(paddleLeftXPosition, paddleLeft.getCoordinates()[1]);
+		paddleRight.getImage().draw(paddleRightXPosition, paddleRight.getCoordinates()[1]);
+		ball.getImage().draw(ball.getCoordinates()[0], ball.getCoordinates()[1]);
 
 		g.drawString("Press 'H' for help", Settings.getFrameWidth()-200, Settings.getFrameHeight()-30);
 
@@ -197,7 +196,7 @@ public class GamePlayState extends BasicGameState {
 	 * 
 	 */
 	private void playerScore() throws SlickException{
-		if(ball.getXPosition() > Settings.getFrameWidth()/2){
+		if(ball.getCoordinates()[0] > Settings.getFrameWidth()/2){
 			leftScore++;
 		}else{
 			rightScore++;

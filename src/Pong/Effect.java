@@ -126,7 +126,7 @@ public class Effect {
 	 * @throws SlickException 
 	 */
 	public Ball fasterBall(Ball ball) throws SlickException{
-		ball.setBallSpeed(ball.getBallSpeed()*1.25);
+		ball.setBallSpeed((float) (ball.getBallSpeed()*1.25));
 		return ball;
 	}
 
@@ -135,8 +135,8 @@ public class Effect {
 	 * @throws SlickException 
 	 */
 	public Ball slowerBall(Ball ball) throws SlickException{
-		// could approach 0 in infinity, which is pretty unlikely
-		ball.setBallSpeed(ball.getBallSpeed()*0.75);
+		// could approach 0 in infinity, but that's pretty unlikely
+		ball.setBallSpeed((float) (ball.getBallSpeed()*0.75));
 		return ball;
 	}
 	
@@ -146,20 +146,18 @@ public class Effect {
 	 * @throws SlickException 
 	 */
 	public boolean checkEffectCollision(Ball ball, Paddle paddleLeft, Paddle paddleRight) throws SlickException{
-//		if(effect != null){
 		//Create 2 shapes identical to the effectImage and ballImage
-		Double ballX = ball.getXPosition();
-		Double ballY = ball.getYPosition();			
-		Shape ballShape = new Circle(ballX.intValue(), ballY.intValue(), ball.getDiameter()/2);
+		float[] coordinates = ball.getCoordinates();
+		int ballRadius = ball.getRadius();
+		Shape ballShape = new Circle(coordinates[0]-ballRadius, coordinates[1]-ballRadius, ballRadius);
 		int effectX = Settings.getFrameWidth()/2 - effectImage.getWidth()/2;
 		int effectY = Settings.getFrameHeight()/2 - effectImage.getHeight()/2;
-		Shape effectShape = new Circle(effectX, effectY, ball.getDiameter()/2);
+		Shape effectShape = new Circle(effectX, effectY, effectImage.getWidth()/2);
 		if(effectShape.intersects(ballShape)){
 			givePlayerEffect(ball, paddleLeft, paddleRight);
 			return true;
 			}
 		return false;
-//		}
 	}
 	
 	/**

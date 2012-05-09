@@ -10,7 +10,10 @@ import org.newdawn.slick.SlickException;
  */
 public class Paddle {
 
-	private int yPosition, xPosition, goal = 0, paddleSpeed = 4, rangeAI = 2;
+	// yPosition, xPosition, 
+	private int[] coordinates = {0,0}; // (x, y)
+	private int[] dimensions = {0,0}; // (width, height)
+	private int goal = 0, paddleSpeed = 4, rangeAI = 2;
 	private Image paddleImage;
 	// minimum output-angle from paddle in degrees (x and 180-x)
 	private final int angle = 30;
@@ -26,43 +29,49 @@ public class Paddle {
 	 */
 	public Paddle(int xPosition, boolean humanPlayer) throws SlickException {
 		paddleImage = new Image("data/paddles/paddle.png");
-		yPosition = (Settings.getFrameHeight()-paddleImage.getHeight())/2;
-		this.xPosition = xPosition;
+		dimensions[0] = paddleImage.getWidth();
+		dimensions[1] = paddleImage.getHeight();
+		coordinates[0] = xPosition;
+		coordinates[1] = (Settings.getFrameHeight()-dimensions[1])/2;
 		isHuman = humanPlayer;
 		
 		if(!isHuman && Settings.getDifficulty().equals("Easy"))
 			paddleSpeed = 2;
 	}
 
-	/**
-	 * Returns the y-coordinate
-	 * 
-	 * @return y-position
-	 */
-	public int getY() {
-		return yPosition;
-	}
-
-	public int getX() {
-		return xPosition;
+//	/**
+//	 * Returns the y-coordinate
+//	 * 
+//	 * @return y-position
+//	 */
+//	public int getY() {
+//		return yPosition;
+//	}
+//
+//	public int getX() {
+//		return xPosition;
+//	}
+	
+	public int[] getCoordinates() {
+		return coordinates;
 	}
 	
 	/**
 	 *  Moves the paddle up
 	 */
 	public void paddleUp() {
-		if(yPosition <= 0)
-			yPosition += paddleSpeed; // stops paddle from exiting screen
-		yPosition -= paddleSpeed;
+		if(coordinates[1] <= 0)
+			coordinates[1] += paddleSpeed; // stops paddle from exiting screen
+		coordinates[1] -= paddleSpeed;
 	}
 
 	/**
 	 *  Moves the paddle down
 	 */
 	public void paddleDown() {
-		if(yPosition >= Settings.getFrameHeight()-paddleImage.getHeight())
-			yPosition -= paddleSpeed; // stops paddle from exiting screen
-		yPosition += paddleSpeed;
+		if(coordinates[1] >= Settings.getFrameHeight()-dimensions[1])
+			coordinates[1] -= paddleSpeed; // stops paddle from exiting screen
+		coordinates[1] += paddleSpeed;
 	}
 	
 	/**
@@ -110,14 +119,17 @@ public class Paddle {
 			ball.serve(-1);
 		}
 	}
-	
-	////////////////////Effects
+
 	public void shrinkPaddle() throws SlickException{
 		paddleImage = new Image("data/paddles/smallpaddle.png");
+		dimensions[0] = paddleImage.getWidth();
+		dimensions[1] = paddleImage.getHeight();
 	}
 	
 	public void enlargePaddle() throws SlickException{
 		paddleImage = new Image("data/paddles/largepaddle.png");
+		dimensions[0] = paddleImage.getWidth();
+		dimensions[1] = paddleImage.getHeight();
 	}
 	
 	public void setPaddleSpeed(int newSpeed) {
@@ -125,6 +137,14 @@ public class Paddle {
 	}
 	
 	public boolean isLeft() {
-		return (xPosition < Settings.getFrameWidth()/2);
+		return (coordinates[0] < Settings.getFrameWidth()/2);
+	}
+	
+	public int getWidth() {
+		return dimensions[0];
+	}
+	
+	public int getHeight() {
+		return dimensions[1];
 	}
 }

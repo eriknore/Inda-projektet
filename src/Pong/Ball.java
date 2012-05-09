@@ -12,13 +12,15 @@ import org.newdawn.slick.SlickException;
  */
 public class Ball {
 
-	private double ballSpeed;
-	private double deltaX, deltaY, xPosition, yPosition;
+	private float ballSpeed, deltaX, deltaY;
+	private float[] coordinates = {0,0}; // (x, y)
+	private int radius;
 	private Image ballImage;
 	private boolean isServingLeft = false, isServingRight = false;
 
 	public Ball() throws SlickException {
 		ballImage = new Image("data/ball/default.png");
+		radius = ballImage.getWidth()/2;
 		ballSpeed = 8;
 
 		// simulate a coinflip to decide which player to serve
@@ -35,16 +37,8 @@ public class Ball {
 	 * 
 	 * @return The ball's position on the x-axis
 	 */
-	public double getXPosition(){
-		return xPosition;
-	}
-
-	/**
-	 * 
-	 * @return The ball's position on the y-axis
-	 */
-	public double getYPosition(){
-		return yPosition;
+	public float[] getCoordinates(){
+		return coordinates;
 	}
 
 	/**
@@ -62,104 +56,104 @@ public class Ball {
 	 * @return
 	 */
 	public void moveBall(Paddle left, Paddle right) {
-		int diameter = ballImage.getWidth();
+		
 		if(isServingLeft) {
-			xPosition = left.getX() + left.getImage().getWidth();
-			yPosition = left.getY() + (left.getImage().getHeight()-diameter)/2;
+			coordinates[0] = left.getCoordinates()[0] + left.getWidth();
+			coordinates[1] = left.getCoordinates()[1] + (left.getHeight()-2*radius)/2;
 			return;
 		}
 		if(isServingRight) {
-			xPosition = right.getX() - diameter;
-			yPosition = right.getY() +(right.getImage().getHeight()-diameter)/2;
+			coordinates[0] = right.getCoordinates()[0] - 2*radius;
+			coordinates[1] = right.getCoordinates()[1] +(right.getHeight()-2*radius)/2;
 			return;
 		}
 		checkWalls();
 		checkPaddles(left, right);
-		yPosition += deltaY;
-		xPosition += deltaX;
+		coordinates[1] += deltaY;
+		coordinates[0] += deltaX;
 		return;
 	}
 
 	private void checkWalls() {
-		if(yPosition <= 0) {
-			yPosition = 1;
+		if(coordinates[1] <= 0) {
+			coordinates[1] = 1;
 			deltaY = -deltaY;
 		}
-		int diameter = ballImage.getWidth();
-		if(yPosition + diameter >= Settings.getFrameHeight()) {
-			yPosition = Settings.getFrameHeight() - diameter -1;
+		
+		if(coordinates[1] + 2*radius >= Settings.getFrameHeight()) {
+			coordinates[1] = Settings.getFrameHeight() - 2*radius -1;
 			deltaY = -deltaY;
 		}
 	}
 
 	private void checkPaddles(Paddle left, Paddle right) {
-		int diameter = ballImage.getWidth();
-		int edgeOfPaddle = left.getX() + left.getImage().getWidth();
+		
+		int edgeOfPaddle = left.getCoordinates()[0] + left.getWidth();
 		// if ball is to the left of left paddle in relation to X-position...
-		if(xPosition + deltaX <= edgeOfPaddle && xPosition + diameter + deltaX >= left.getX()) {
-			int leftY = left.getY();
+		if(coordinates[0] + deltaX <= edgeOfPaddle && coordinates[0] + 2*radius + deltaX >= left.getCoordinates()[0]) {
+			int leftY = left.getCoordinates()[1];
 			// ... then check if it is hitting the paddle or not
-			if(yPosition <= leftY + left.getImage().getHeight() && yPosition + diameter >= leftY) {
-				xPosition = edgeOfPaddle;
-				double angle = getAngleFromPaddle(left);
-				deltaY = ballSpeed*Math.sin(angle);
-				deltaX = ballSpeed*Math.cos(angle);
+			if(coordinates[1] <= leftY + left.getHeight() && coordinates[1] + 2*radius >= leftY) {
+				coordinates[0] = edgeOfPaddle;
+				float angle = getAngleFromPaddle(left);
+				deltaY = (float) (ballSpeed*Math.sin(angle));
+				deltaX = (float) (ballSpeed*Math.cos(angle));
 			}
 		}
-		edgeOfPaddle = right.getX();
+		edgeOfPaddle = right.getCoordinates()[0];
 		// if ball is to the right of right paddle in relation to X-position...
-		if(xPosition + diameter + deltaX >= edgeOfPaddle && xPosition + deltaX <= edgeOfPaddle + right.getImage().getWidth()) {
-			int rightY = right.getY();
+		if(coordinates[0] + 2*radius + deltaX >= edgeOfPaddle && coordinates[0] + deltaX <= edgeOfPaddle + right.getWidth()) {
+			int rightY = right.getCoordinates()[1];
 			// ... then check if it is hitting the paddle or not
-			if(yPosition <= rightY + right.getImage().getHeight() && yPosition + diameter >= rightY) {
-				xPosition = edgeOfPaddle - diameter;
-				double angle = getAngleFromPaddle(right);
-				deltaY = ballSpeed*Math.sin(angle);
-				deltaX = -ballSpeed*Math.cos(angle);
+			if(coordinates[1] <= rightY + right.getHeight() && coordinates[1] + 2*radius >= rightY) {
+				coordinates[0] = edgeOfPaddle - 2*radius;
+				float angle = getAngleFromPaddle(right);
+				deltaY = (float) (ballSpeed*Math.sin(angle));
+				deltaX = (float) (-ballSpeed*Math.cos(angle));
 			}
 		}
 	}
 	
-	private double getAngleFromPaddle(Paddle paddle) {
-		int paddleY = paddle.getY();
-		int diameter = ballImage.getWidth();
+	private float getAngleFromPaddle(Paddle paddle) {
+		int paddleY = paddle.getCoordinates()[1];
+		
 		// ball relative to paddle, value is where on paddle the center of ball is
-		double ballValue = (yPosition-(paddleY-diameter)); 	
+		float ballValue = (coordinates[1]-(paddleY-2*radius)); 	
 		// the angle at which the ball is returned with angle in relation to Y-axel (default angle is 30)
-		double returnAngle = (90-paddle.getAngle()); // i.e. 60 degrees from X-axel and up to (Y-axel+30)
+		float returnAngle = (90-paddle.getAngle()); // i.e. 60 degrees from X-axel and up to (Y-axel+30)
 		// half the paddle-height including ball-radius at both ends of paddle
-		double halfPaddleHeight = (paddle.getImage().getHeight() + diameter)/2; // default: 120/2
+		float halfPaddleHeight = (paddle.getHeight() + 2*radius)/2; // default: 120/2
 		// set a ratio between angle and paddle-size
-		double angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
-		double angle;
-		if(yPosition+diameter/2 < paddleY+halfPaddleHeight) { // above paddle-center
+		float angleHeightRatio = returnAngle/halfPaddleHeight; // default: 60 degrees/60 pixels
+		Double angle;
+		if(coordinates[1]+radius < paddleY+halfPaddleHeight) { // above paddle-center
 			// newYSpeed = 60 degrees - ([max.ballValue=60, min=1] * [60 degrees/60 pixels])
 			// 1<= newYSpeed <= 60
 			angle = -Math.toRadians(returnAngle-(ballValue*angleHeightRatio)); // minus because up is -Y
-		} else if(yPosition+diameter/2 > paddleY + halfPaddleHeight) { // below paddle-center
+		} else if(coordinates[1]+radius > paddleY + halfPaddleHeight) { // below paddle-center
 			// newYSpeed = -60 degrees - ([max.ballValue=120, min=61] * [60 degrees/60 pixels])
 			// 1<= newYSpeed <= 60
 			angle = Math.toRadians((-returnAngle)+(ballValue*angleHeightRatio));
 		} else { // dead on center
-			angle = 0; // straight back
+			angle = 0.0; // straight back
 		}
-		return angle;
+		return angle.floatValue();
 	}
 
 	public boolean checkOutOfBounds(Paddle left, Paddle right) {
-		int diameter = ballImage.getWidth();
-		if(xPosition - 50 > Settings.getFrameWidth()) {
+		
+		if(coordinates[0] - 50 > Settings.getFrameWidth()) {
 			isServingRight = true;
 			deltaY = 0;
-			xPosition = right.getX() - diameter;
-			yPosition = Settings.getFrameHeight()/2 - diameter/2;
+			coordinates[0] = right.getCoordinates()[0] - 2*radius;
+			coordinates[1] = Settings.getFrameHeight()/2 - radius;
 			return true;
 		}
-		if(xPosition + 50 < 0) {
+		if(coordinates[0] + 50 < 0) {
 			isServingLeft = true;
 			deltaY = 0;
-			xPosition = left.getX() + left.getImage().getWidth();
-			yPosition = Settings.getFrameHeight()/2 - diameter/2;
+			coordinates[0] = left.getCoordinates()[0] + left.getWidth();
+			coordinates[1] = Settings.getFrameHeight()/2 - radius;
 			return true;
 		}
 		return false;
@@ -173,15 +167,15 @@ public class Ball {
 		return isServingRight;
 	}
 	
-	public double getDeltaY() {
+	public float getDeltaY() {
 		return deltaY;
 	}
 	
-	public double getDeltaX() {
+	public float getDeltaX() {
 		return deltaX;
 	}
 	
-	public double getBallSpeed() {
+	public float getBallSpeed() {
 		return ballSpeed;
 	}
 	
@@ -191,25 +185,27 @@ public class Ball {
 		isServingRight = false;
 	}
 	
-	//////////////////////Effects
-	public int getDiameter(){ //behöver radien för att skapa en Circle shape, 
-		return ballImage.getWidth();
+	public int getRadius(){
+		return radius;
 	}
 	
 	public void shrinkBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/smallball.png");
+		radius = ballImage.getWidth()/2;
 	}
 	
 	public void enlargeBall(Ball ball) throws SlickException{
 		ballImage = new Image("data/ball/largeball.png");
+		radius = ballImage.getWidth()/2;
 	}
 	
 	public void resetBall() throws SlickException{
 		ballImage = new Image("data/ball/default.png");
+		radius = ballImage.getWidth()/2;
 		ballSpeed = 8;
 	}
 	
-	public void setBallSpeed(double newSpeed) {
+	public void setBallSpeed(float newSpeed) {
 		ballSpeed = newSpeed;
 	}
 	
