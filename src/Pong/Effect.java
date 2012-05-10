@@ -36,28 +36,28 @@ public class Effect {
 		int randomEffect = rand.nextInt(8); //Four pictures
 
 		switch (randomEffect){
-		case 0: effectImage = new Image("data/effects/largerballeffect.png");
+		case 0: effectImage = new Image("data/effects/powerup.png");
 		effectType = "Larger Paddle";
 		break;
-		case 1: effectImage = new Image("data/effects/smallerballeffect.png");
+		case 1: effectImage = new Image("data/effects/powerdown.png");
 		effectType = "Smaller Paddle";
 		break;
-		case 2: effectImage = new Image("data/effects/smallerballeffect.png");
+		case 2: effectImage = new Image("data/effects/powerdown.png");
 		effectType = "Smaller Ball";
 		break;
-		case 3: effectImage = new Image("data/effects/largerballeffect.png");
+		case 3: effectImage = new Image("data/effects/powerup.png");
 		effectType = "Larger Ball";
 		break;
-		case 4: effectImage = new Image("data/effects/smallerballeffect.png");
+		case 4: effectImage = new Image("data/effects/powerdown.png");
 		effectType = "Faster Ball";
 		break;
-		case 5: effectImage = new Image("data/effects/largerballeffect.png");
+		case 5: effectImage = new Image("data/effects/powerup.png");
 		effectType = "Slower Ball";
 		break;
-		case 6: effectImage = new Image("data/effects/largerballeffect.png");
+		case 6: effectImage = new Image("data/effects/powerup.png");
 		effectType = "Faster Paddle";
 		break;
-		case 7: effectImage = new Image("data/effects/smallerballeffect.png");
+		case 7: effectImage = new Image("data/effects/powerdown.png");
 		effectType = "Slower Paddle";
 		break;
 		}

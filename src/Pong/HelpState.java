@@ -20,8 +20,7 @@ import org.newdawn.slick.state.transition.Transition;
 public class HelpState extends BasicGameState {
 
 	private int stateID = -1;
-	private Image helpmenubackground, largeBallEffect, smallBallEffect, largePaddleEffect, smallPaddleEffect;
-    private static int width = 800, height = 600; // resolution
+	private Image helpmenubackground, powerUp, powerDown;
 	
 	public HelpState(int stateID) {
 		this.stateID = stateID;
@@ -31,10 +30,8 @@ public class HelpState extends BasicGameState {
 	public void init(GameContainer gc, StateBasedGame sbg)
 			throws SlickException {
 		helpmenubackground = new Image("data/backgrounds/helpmenubackground.png");
-		largeBallEffect = new Image("data/effects/largerballeffect.png");
-		smallBallEffect = new Image("data/effects/smallerballeffect.png");
-		smallPaddleEffect = new Image("data/effects/smallerpaddleeffect.png");
-		largePaddleEffect = new Image("data/effects/largerpaddleeffect.png");
+		powerUp = new Image("data/effects/powerup.png");
+		powerDown = new Image("data/effects/powerdown.png");
 	}
 
 	@Override
@@ -45,31 +42,21 @@ public class HelpState extends BasicGameState {
 		int leftLineX = 50;
 		int y = 50;
 		
-//		largeBallEffect.draw(leftLineX, y+300);
-//		g.drawString(" - Happy effect", leftLineX+ 30, y+300);
-//		
-//		smallBallEffect.draw(leftLineX, y + 340);
-//		g.drawString(" - Sad effect", leftLineX + 30, y + 340);
-//		
-//		largePaddleEffect.draw(leftLineX, y + 400);
-//		g.drawString(" - Happy paddle!", leftLineX + 30 , y+ 400);
-//		
-//		smallPaddleEffect.draw(leftLineX+200, y + 400);
-//		g.drawString("- Sad Paddle!", leftLineX + 230, y + 400);
+		powerUp.draw(leftLineX, y+300);
+		g.drawString("[Random Power-Up]\nIncreases:\n -Ball size\n -Paddle size\n -Paddle speed\nDecreases:\n -Ball speed", leftLineX + 30, y + 300);
 		
+		powerDown.draw(leftLineX + 300, y + 300);
+		g.drawString("[Random Power-Down]\nIncreases:\n -Ball speed\nDecreases:\n -Ball size\n -Paddle size\n -Paddle speed", leftLineX + 330, y + 300);
 		
 		g.drawString("Right Player controls: ", rightLineX, y);
 		g.drawString("Move up: Up Arrow", rightLineX, y+50);
 		g.drawString("Move down: Down Arrow", rightLineX, y+100);
 		g.drawString("Serve: Left Arrow", rightLineX, y+150);
-//		g.drawString("Use Weapon: Left Arrow", rightLineX, y+200);
 		g.drawString("Left Player controls: ", leftLineX, y);
 		g.drawString("Move up: W", leftLineX, y+50);
 		g.drawString("Move down: S", leftLineX, y+100);
 		g.drawString("Serve: D", leftLineX, y+150);
-//		g.drawString("Use Weapon: D", leftLineX, y+200);
-		
-		g.drawString("Press 'H' to return, 'Esc' to return to main menu", 300, height-30); 
+		g.drawString("Press 'H' to return, 'Esc' to return to main menu", 300, Settings.getFrameHeight()-30); 
 	}
 
 	@Override
@@ -85,10 +72,13 @@ public class HelpState extends BasicGameState {
 			sbg.enterState(PongGame.GAMEPLAYSTATE, t, t);
 		
 	}
-
+	
+	/**
+	 * Returns the state ID.
+	 * @return Returns the state ID
+	 */
 	@Override
 	public int getID() {
 		return stateID;
 	}
-
 }

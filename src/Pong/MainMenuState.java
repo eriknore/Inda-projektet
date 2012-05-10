@@ -49,8 +49,8 @@ public class MainMenuState extends BasicGameState {
 		demoButton.draw(firstMenuButtonX, firstMenuButtonY + 160);
 		quitButton.draw(firstMenuButtonX, firstMenuButtonY + 240);
 		buttonVisualEffect();
-		
-	
+
+
 	}
 
 	/**
