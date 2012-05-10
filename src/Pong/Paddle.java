@@ -17,7 +17,8 @@ public class Paddle {
 	private int[] coordinates = {0,0}; // (x, y)
 	private int[] dimensions = {0,0}; // (width, height)
 	// goal is the y-coordinate the AI-paddle should aim for
-	private int goal = 0, paddleSpeed = 4;
+	private int goal = 0;
+	private float paddleSpeed = 4;
 	// rangeAI is range from paddle center, used to determine how 
 	// far from center the ball will hit the paddle if paddle is AI
 	private int rangeAI = 2;
@@ -148,8 +149,12 @@ public class Paddle {
 		dimensions[1] = paddleImage.getHeight();
 	}
 	
-	public void setPaddleSpeed(int newSpeed) {
+	public void setPaddleSpeed(float newSpeed) {
 		paddleSpeed = newSpeed;
+	}
+	
+	public float getPaddleSpeed() {
+		return paddleSpeed;
 	}
 	
 	public boolean isLeft() {

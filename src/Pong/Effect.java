@@ -33,7 +33,7 @@ public class Effect {
 	 */
 	public void setEffectImage() throws SlickException{
 		Random rand = new Random();
-		int randomEffect = rand.nextInt(6); //Four pictures
+		int randomEffect = rand.nextInt(8); //Four pictures
 
 		switch (randomEffect){
 		case 0: effectImage = new Image("data/effects/largerballeffect.png");
@@ -53,6 +53,12 @@ public class Effect {
 		break;
 		case 5: effectImage = new Image("data/effects/largerballeffect.png");
 		effectType = "Slower Ball";
+		break;
+		case 6: effectImage = new Image("data/effects/largerballeffect.png");
+		effectType = "Faster Paddle";
+		break;
+		case 7: effectImage = new Image("data/effects/smallerballeffect.png");
+		effectType = "Slower Paddle";
 		break;
 		}
 	}
@@ -141,6 +147,25 @@ public class Effect {
 	}
 	
 	/**
+	 * A negative effect, increases the speed of the paddle
+	 * @throws SlickException 
+	 */
+	private Paddle fasterPaddle(Paddle paddle) throws SlickException{
+		paddle.setPaddleSpeed((float) (paddle.getPaddleSpeed()*1.25));
+		return paddle;
+	}
+
+	/**
+	 * A positive effect, decreases the ball speed
+	 * @throws SlickException 
+	 */
+	private Paddle slowerPaddle(Paddle paddle) throws SlickException{
+		// could approach 0 in infinity, but that's pretty unlikely
+		paddle.setPaddleSpeed((float) (paddle.getPaddleSpeed()*0.75));
+		return paddle;
+	}
+	
+	/**
 	 * Checks if a player has obtained
 	 * the effect.
 	 * @throws SlickException 
@@ -184,5 +209,9 @@ public class Effect {
 			ball = slowerBall(ball);
 		if(effectType.equals("Faster Ball"))
 			ball = fasterBall(ball);
+		if(effectType.equals("Slower Paddle"))
+			paddleToChange = slowerPaddle(paddleToChange);
+		if(effectType.equals("Faster Paddle"))
+			paddleToChange = fasterPaddle(paddleToChange);
 	}
 }

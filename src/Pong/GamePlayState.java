@@ -208,7 +208,15 @@ public class GamePlayState extends BasicGameState {
 				paddleLeft.shrinkPaddle();
 			if(input.isKeyDown(Input.KEY_F8))
 				paddleRight.shrinkPaddle();
-			if(input.isKeyDown(Input.KEY_F12)) {
+			if(input.isKeyPressed(Input.KEY_F9))
+				paddleLeft.setPaddleSpeed((float) (paddleLeft.getPaddleSpeed()*1.25));
+			if(input.isKeyPressed(Input.KEY_F10))
+				paddleRight.setPaddleSpeed((float) (paddleRight.getPaddleSpeed()*1.25));
+			if(input.isKeyPressed(Input.KEY_F11))
+				paddleLeft.setPaddleSpeed((float) (paddleLeft.getPaddleSpeed()*0.75));
+			if(input.isKeyPressed(Input.KEY_F12))
+				paddleRight.setPaddleSpeed((float) (paddleRight.getPaddleSpeed()*0.75));
+			if(input.isKeyDown(Input.KEY_BACK)) {
 				paddleRight.resetPaddle();
 				ball.resetBall();
 			}
