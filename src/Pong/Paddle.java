@@ -6,26 +6,31 @@ import org.newdawn.slick.SlickException;
 /**
  * 
  * @author Erik Norell & Daniel Aceituno
- * @version 2012-04-16
+ * @version 2012-05-10
+ */
+/**
+ * @author Erik
+ *
  */
 public class Paddle {
-
-	// yPosition, xPosition, 
+ 
 	private int[] coordinates = {0,0}; // (x, y)
 	private int[] dimensions = {0,0}; // (width, height)
-	private int goal = 0, paddleSpeed = 4, rangeAI = 2;
+	// goal is the y-coordinate the AI-paddle should aim for
+	private int goal = 0, paddleSpeed = 4;
+	// rangeAI is range from paddle center, used to determine how 
+	// far from center the ball will hit the paddle if paddle is AI
+	private int rangeAI = 2;
 	private Image paddleImage;
-	// minimum output-angle from paddle in degrees (x and 180-x)
+	// minimum output-angle from paddle in degrees (0+angle and 180-angle)
 	private final int angle = 30;
 	private boolean isHuman;
 
 	/**
 	 * Creates a paddle
-	 * 
-	 * @param yCoordinate
-	 *            the Y-position of upper left corner at which the paddle is
-	 *            drawn
-	 * @throws SlickException 
+	 * @param xPosition where on x-axis the left border of a paddle is
+	 * @param humanPlayer if player/paddle is human true, if AI false
+	 * @throws SlickException
 	 */
 	public Paddle(int xPosition, boolean humanPlayer) throws SlickException {
 		paddleImage = new Image("data/paddles/paddle.png");
@@ -38,20 +43,12 @@ public class Paddle {
 		if(!isHuman && Settings.getDifficulty().equals("Easy"))
 			paddleSpeed = 2;
 	}
-
-//	/**
-//	 * Returns the y-coordinate
-//	 * 
-//	 * @return y-position
-//	 */
-//	public int getY() {
-//		return yPosition;
-//	}
-//
-//	public int getX() {
-//		return xPosition;
-//	}
 	
+	/**
+	 * Returns the current coordinates of paddle in form of an int[] of size 2,
+	 * where x-coordinate is [0] and y-coordinate [1]
+	 * @return int[0] = x-coordinate, int[1] = y-coordinate
+	 */
 	public int[] getCoordinates() {
 		return coordinates;
 	}
@@ -83,15 +80,28 @@ public class Paddle {
 		return paddleImage;
 	}
 	
+	/**
+	 * Returns the preset maximum output angle of the ball after colliding
+	 * with a paddle. On y-axis it's 0+angle and 180-angle
+	 * @return The maximum output angle of ball
+	 */
 	public int getAngle() {
 		return angle;
 	}
 		
+	/**
+	 * Returns true if player/paddle is controlled by user. Returns false 
+	 * if controlled by AI
+	 * @return true if player/paddle is human, if AI false
+	 */
 	public boolean isHuman() {
 		return isHuman;
 	}
 	
 
+	/**
+	 * @param goal
+	 */
 	public void setGoal(int goal) {
 		this.goal = goal;
 	}

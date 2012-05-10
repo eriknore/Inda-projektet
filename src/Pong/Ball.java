@@ -141,8 +141,8 @@ public class Ball {
 		
 		// ball relative to paddle, value is where on paddle the center of ball is
 		float ballValue = (coordinates[1]-(paddleY-2*radius)); 	
-		// the angle at which the ball is returned with angle in relation to Y-axel (default angle is 30)
-		float returnAngle = (90-paddle.getAngle()); // i.e. 60 degrees from X-axel and up to (Y-axel+30)
+		// the angle at which the ball is returned with angle in relation to Y-axis (default angle is 30)
+		float returnAngle = (90-paddle.getAngle()); // i.e. 60 degrees from X-axis and up to (Y-axis+30)
 		// half the paddle-height including ball-radius at both ends of paddle
 		float halfPaddleHeight = (paddle.getHeight() + 2*radius)/2; // default: 120/2
 		// set a ratio between angle and paddle-size
