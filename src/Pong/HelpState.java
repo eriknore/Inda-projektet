@@ -15,7 +15,7 @@ import org.newdawn.slick.state.transition.Transition;
  * Used when the player presses the 'H' button
  * during the gameplay.
  * @author Erik Norell & Daniel Aceituno
- * @version 2012-04-23
+ * @version 2012-05-10
  */
 public class HelpState extends BasicGameState {
 

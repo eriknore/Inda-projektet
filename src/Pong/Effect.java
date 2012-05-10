@@ -11,11 +11,11 @@ import org.newdawn.slick.geom.Shape;
  * Effects can be obtained by hitting them with
  * the ball, they give either positive or negative effects
  * to the player.
- * Effects appear randomly in the middle and dissapears
+ * Effects appear randomly in the middle and disappears
  * when obtained by a player.
  * 
  * @author Erik Norell & Daniel Aceituno 
- * @version 2012-04-28
+ * @version 2012-05-10
  */
 public class Effect {
 

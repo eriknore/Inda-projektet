@@ -15,7 +15,7 @@ import org.newdawn.slick.state.transition.Transition;
  * A stateclass representing the main menu.
  * Used when the game starts.
  * @author Erik Norell & Daniel Aceituno
- * @version 2012-04-23
+ * @version 2012-05-10
  */
 public class MainMenuState extends BasicGameState {
 
@@ -54,7 +54,7 @@ public class MainMenuState extends BasicGameState {
 	}
 
 	/**
-	 * Temporarly decreases the button's scale if
+	 * Temporarily increases the button's scale if
 	 * the mouse is on the button.
 	 */
 	private void buttonVisualEffect(){

@@ -12,9 +12,14 @@ import org.newdawn.slick.state.transition.FadeOutTransition;
 import org.newdawn.slick.state.transition.Transition;
 
 /**
+ * This is the class doing the most of the work behind
+ * the game. It initiates all components used in the game.
+ * It has the main functions update, which updates everything
+ * that is happening on screen and taking user input, and
+ * render, drawing everything that is happening on screen.
  * 
  * @author Erik Norell & Daniel Aceituno
- * @version 2012-04-16
+ * @version 2012-05-10
  */
 public class GamePlayState extends BasicGameState {
 
@@ -60,8 +65,6 @@ public class GamePlayState extends BasicGameState {
 		paddleLeft = new Paddle(paddleLeftXPosition, Settings.isLeftPaddleHuman()); // both paddles start at same y-position
 		paddleRightXPosition = Settings.getFrameWidth()-paddleLeftXPosition-paddleLeft.getImage().getWidth();
 		paddleRight = new Paddle(paddleRightXPosition, Settings.isRightPaddleHuman());
-		// mirror the startposition of paddle1
-		ball = new Ball();
 		if(paddleRight.isHuman()) {
 			playerRight = "Player 1";
 		} else {
@@ -72,6 +75,9 @@ public class GamePlayState extends BasicGameState {
 		} else {
 			playerLeft = "PC";
 		}
+
+		ball = new Ball();
+		
 		limit = 1 + rand.nextInt(30000);
 		if(!paddleLeft.isHuman() || !paddleRight.isHuman())
 			ai = new AI();
@@ -80,13 +86,18 @@ public class GamePlayState extends BasicGameState {
 	@Override
 	public void update(GameContainer container, StateBasedGame sbg, int delta)
 			throws SlickException {
+		// Resets game if new game is started
 		if(!Settings.isGameRunning()){
 			leftScore = 0;
 			rightScore = 0;
+			ai = null;
+			effect = null;
+			stopwatch = 0;
 			init(container, sbg);
 			Settings.setGameIsRunning(true);
 		}
 		
+		// Controls print-out of effect-name
 		if(drawEffect) {
 			delay += delta;
 			if(delay > 1000) {
@@ -95,6 +106,10 @@ public class GamePlayState extends BasicGameState {
 			}
 		}
 		
+		// Controls the behavior of effects. Limit is set randomly
+		// (default is 1-30 seconds). A new effect will be created 
+		// each time limit is reached (limit will then be randomly 
+		// set again).
 		stopwatch += delta;
 		if(stopwatch > limit) {
 			effect = new Effect();
@@ -108,18 +123,23 @@ public class GamePlayState extends BasicGameState {
 			stopwatch = 0;
 		}
 		
+		// Controls update in relation to time, should be
+		// ok to play down to 100-150 FPS
 		updateInterval += delta;
 		int updateLimit = 20;
 		if(updateInterval < updateLimit)
 			return;
 
+		// get user input
 		getInput(container, sbg);
 		
+		// AI-movement
 		if(!paddleRight.isHuman())
 			ai.getAIMovement(paddleRight, ball);
 		if (!paddleLeft.isHuman())
 			ai.getAIMovement(paddleLeft, ball);
 		
+		// move the ball
 		ball.moveBall(paddleLeft, paddleRight);
 		if(effect != null) {
 			if(effect.checkEffectCollision(ball, paddleLeft, paddleRight)) {
@@ -160,8 +180,10 @@ public class GamePlayState extends BasicGameState {
 	}
 
 	/**
-	 * @param container
-	 * @param sbg
+	 * This checks for all user input of the keyboard to
+	 * control the paddles
+	 * @param container Slick Container
+	 * @param sbg Slick StateBasedGame
 	 * @throws SlickException
 	 */
 	private void getInput(GameContainer container, StateBasedGame sbg) throws SlickException {
@@ -223,8 +245,9 @@ public class GamePlayState extends BasicGameState {
 		}
 	}
 	/**
+	 * If ball is out of screen, points will be given to
+	 * the appropriate side and game is reset.
 	 * @throws SlickException 
-	 * 
 	 */
 	private void playerScore() throws SlickException{
 		if(ball.getCoordinates()[0] > Settings.getFrameWidth()/2){
@@ -236,6 +259,7 @@ public class GamePlayState extends BasicGameState {
 	}
 	
 	/**
+	 * Resets the positions of paddle and ball, as well as any effects
 	 * @throws SlickException
 	 */
 	private void reset() throws SlickException{

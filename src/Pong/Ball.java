@@ -7,6 +7,8 @@ import org.newdawn.slick.SlickException;
 
 
 /**
+ * This class creates the ball of the game and basically
+ * controls all it's behavior during gameplay.
  * @author Erik Norell & Daniel Aceituno 
  * @version 2012-05-09
  */
@@ -56,7 +58,7 @@ public class Ball {
 
 	/**
 	 * Moves the ball one frame, checking for if someone is serving,
-	 * wall-collisions and paddle-collisions.
+	 * for wall-collisions and for paddle-collisions.
 	 * @param left Left Paddle
 	 * @param right Right Paddle
 	 */
@@ -132,7 +134,7 @@ public class Ball {
 	/**
 	 * Calculates the angle at which the ball bounces of a paddle, 
 	 * the further from center the greater the angle (default is 30-120 degrees,
-	 *  paddle as reference)
+	 * paddle as reference)
 	 * @param paddle The paddle which the ball collides with
 	 * @return The angle at which the ball travels after colliding with a paddle
 	 */
@@ -272,7 +274,7 @@ public class Ball {
 	
 	
 	/**
-	 * Resets the image and speed to default
+	 * Resets the ball size and speed to default
 	 * @throws SlickException
 	 */
 	public void resetBall() throws SlickException{

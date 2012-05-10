@@ -6,6 +6,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 /**
+ * This is the main class, basically it just initiates
+ * all game-states and starts game.
  * @author Erik Norell & Daniel Aceituno
  * @version 2012-04-23
  */
